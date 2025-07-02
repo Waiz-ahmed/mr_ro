@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class CreditCustomer extends Model
 {
+
+    protected $fillable = ['customer_id', 'daily_sale_id', 'balance'];
+    
     public function customer()
     {
         return $this->belongsTo(Customer::class);

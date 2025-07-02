@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\CreditCustomer;  
 
 class CreditCustomerController extends Controller
 {
@@ -11,8 +12,12 @@ class CreditCustomerController extends Controller
      */
     public function index()
     {
-        $credits = CreditCustomer::with(['customer', 'dailySale'])->latest()->get();
-        return view('credits.index', compact('credits'));
+         $groupedCredits = CreditCustomer::with('customer')
+            ->selectRaw('customer_id, SUM(balance) as total_balance')
+            ->groupBy('customer_id')
+            ->get();
+
+        return view('credits.index', compact('groupedCredits'));
     }
 
     /**

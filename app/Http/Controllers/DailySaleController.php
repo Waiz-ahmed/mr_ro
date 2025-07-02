@@ -31,25 +31,27 @@ class DailySaleController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:1',
+        $validated = $request->validate([
+            'item' => 'required|string|max:255',
+            'amount' => 'required|numeric',
             'quantity' => 'required|integer|min:1',
+            'total_amount' => 'required|numeric',
+            'sale_date' => 'required|date',
+            'customer_id' => 'nullable|exists:customers,id',
+            'is_credit' => 'nullable|boolean',
         ]);
 
-        $sale = DailySale::create([
-            'item' => $request->item ?? 'Ration Pack',
-            'amount' => $request->amount,
-            'quantity' => $request->quantity,
-            'customer_id' => $request->customer_id,
-            'is_credit' => $request->is_credit ? 1 : 0,
-        ]);
+        $validated['is_credit'] = $request->has('is_credit') ? 1 : 0;
 
-        // If credit sale, record it in CreditCustomer
-        if ($request->is_credit && $request->customer_id) {
+        $sale = DailySale::create($validated);
+
+        // Handle credit entry
+        if ($validated['is_credit'] && $validated['customer_id']) {
             CreditCustomer::create([
-                'customer_id' => $request->customer_id,
+                'customer_id' => $validated['customer_id'],
                 'daily_sale_id' => $sale->id,
-                'balance' => $request->amount * $request->quantity,
+                'amount' => $validated['total_amount'],
+                'balance' => $validated['total_amount'], // if balance is same as amount
             ]);
         }
 
