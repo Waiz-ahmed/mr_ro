@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\DailySale;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Customer;
+use Illuminate\Support\Carbon;
 
 class DailySaleController extends Controller
 {
@@ -36,22 +37,24 @@ class DailySaleController extends Controller
             'amount' => 'required|numeric',
             'quantity' => 'required|integer|min:1',
             'total_amount' => 'required|numeric',
-            'sale_date' => 'required|date',
             'customer_id' => 'nullable|exists:customers,id',
             'is_credit' => 'nullable|boolean',
         ]);
 
         $validated['is_credit'] = $request->has('is_credit') ? 1 : 0;
 
+        // ✅ Auto-set the sale_date to today
+        $validated['sale_date'] = Carbon::today();
+
         $sale = DailySale::create($validated);
 
-        // Handle credit entry
+        // Credit logic
         if ($validated['is_credit'] && $validated['customer_id']) {
             CreditCustomer::create([
                 'customer_id' => $validated['customer_id'],
                 'daily_sale_id' => $sale->id,
                 'amount' => $validated['total_amount'],
-                'balance' => $validated['total_amount'], // if balance is same as amount
+                'balance' => $validated['total_amount'],
             ]);
         }
 

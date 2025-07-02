@@ -36,11 +36,11 @@
         <input type="hidden" name="total_amount" id="hiddenTotal">
     </div>
 
-    {{-- Sale Date --}}
+    <!-- {{-- Sale Date --}}
     <div class="mb-3">
         <label class="form-label">Sale Date</label>
         <input type="date" name="sale_date" class="form-control" value="{{ date('Y-m-d') }}">
-    </div>
+    </div> -->
 
     {{-- Credit Customer --}}
     <div class="mb-3">
