@@ -7,6 +7,7 @@ use App\Models\DailySale;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Customer;
 use Illuminate\Support\Carbon;
+use App\Models\CreditCustomer;
 
 class DailySaleController extends Controller
 {

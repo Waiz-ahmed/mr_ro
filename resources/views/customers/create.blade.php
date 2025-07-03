@@ -1,24 +1,28 @@
 @extends('layouts.master')
 
-@section('title', 'Add Vendor')
+@section('title', 'Add Customer')
 
 @section('content')
-<h2>Add Vendor</h2>
+    <h2>Add New Customer</h2>
 
-<form action="{{ route('vendors.store') }}" method="POST">
-    @csrf
+    <form method="POST" action="{{ route('customers.store') }}">
+        @csrf
 
-    <div class="mb-3">
-        <label>Name</label>
-        <input type="text" name="name" class="form-control" required>
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input name="name" class="form-control" required>
+        </div>
 
-    <div class="mb-3">
-        <label>Contact</label>
-        <input type="text" name="contact" class="form-control">
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <input name="phone" class="form-control">
+        </div>
 
-    <button type="submit" class="btn btn-success">Save</button>
-    <a href="{{ route('vendors.index') }}" class="btn btn-secondary">Back</a>
-</form>
+        <div class="mb-3">
+            <label class="form-label">Address</label>
+            <textarea name="address" class="form-control"></textarea>
+        </div>
+
+        <button class="btn btn-primary">Save</button>
+    </form>
 @endsection

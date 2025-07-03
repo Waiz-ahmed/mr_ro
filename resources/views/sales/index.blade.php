@@ -93,7 +93,7 @@
                     {{-- Amount --}}
                     <div class="mb-3">
                         <label for="payment_amount" class="form-label">Amount</label>
-                        <input type="number" id="payment_amount" name="amount" class="form-control" required min="1">
+                        <input type="number" id="payment_amount" name="amount_paid" class="form-control" required min="1">
                     </div>
 
                     {{-- Payment Method --}}
