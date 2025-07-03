@@ -11,10 +11,13 @@ class DailySale extends Model
         'amount',
         'quantity',
         'total_amount',
-        'sale_date',
         'customer_id',
         'is_credit',
+        'sale_date',
+        'month',
+        'year',
     ];
+
 
 
 }

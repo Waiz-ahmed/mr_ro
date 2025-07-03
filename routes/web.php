@@ -38,6 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('payments', PaymentController::class);
     Route::resource('vendors', VendorController::class);
     Route::resource('expenses', ExpenseController::class);
+    Route::get('/credits/invoice/{customer}', [CreditCustomerController::class, 'generateInvoice'])->name('credits.invoice');
 });
 
 // Include Breeze default auth routes (login, register, etc.)

@@ -19,6 +19,9 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $credit->customer->name }} ({{ $credit->customer->phone }})</td>
                 <td><strong>Rs. {{ number_format($credit->total_balance, 0) }}</strong></td>
+                <td>
+                    <a href="{{ route('credits.invoice', $credit->customer_id) }}" class="btn btn-sm btn-info">Create Invoice</a>
+                </td>
             </tr>
         @empty
             <tr>

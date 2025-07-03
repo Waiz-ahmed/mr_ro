@@ -11,12 +11,14 @@ class CreditCustomer extends Model
     
     public function customer()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
+
 
     public function dailySale()
     {
-        return $this->belongsTo(DailySale::class);
+        return $this->belongsTo(DailySale::class, 'daily_sale_id');
     }
+
 
 }

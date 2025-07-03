@@ -46,6 +46,8 @@ class DailySaleController extends Controller
 
         // ✅ Auto-set the sale_date to today
         $validated['sale_date'] = Carbon::today();
+        $validated['month'] = Carbon::now()->format('F');
+        $validated['year'] = Carbon::now()->year;
 
         $sale = DailySale::create($validated);
 
@@ -54,6 +56,7 @@ class DailySaleController extends Controller
             CreditCustomer::create([
                 'customer_id' => $validated['customer_id'],
                 'daily_sale_id' => $sale->id,
+                'credit_date' => now(),
                 'amount' => $validated['total_amount'],
                 'balance' => $validated['total_amount'],
             ]);
