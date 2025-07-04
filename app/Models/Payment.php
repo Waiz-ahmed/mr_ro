@@ -14,4 +14,10 @@ class Payment extends Model
         'note',
     ];
 
+    public function customer()
+    {
+        return $this->belongsTo(\App\Models\Customer::class);
+    }
+
+
 }
