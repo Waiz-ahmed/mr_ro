@@ -16,9 +16,19 @@ class DailySaleController extends Controller
      */
     public function index()
     {
+        $firstShop = \App\Models\Shop::first();
+
+        if (!$firstShop) {
+            return redirect()->back()->with('error', 'No shops found.');
+        }
+
         $customers = Customer::all();
-        return view('sales.index', compact('customers'));
+        return view('sales.index', [
+            'customers' => $customers,
+            'shop' => $firstShop
+        ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -40,6 +50,7 @@ class DailySaleController extends Controller
             'total_amount' => 'required|numeric',
             'customer_id' => 'nullable|exists:customers,id',
             'is_credit' => 'nullable|boolean',
+            'shop_id' => 'required|exists:shops,id', // ✅ ADD THIS
         ]);
 
         $validated['is_credit'] = $request->has('is_credit') ? 1 : 0;
@@ -62,7 +73,7 @@ class DailySaleController extends Controller
             ]);
         }
 
-        return redirect()->route('sales.index')->with('success', 'Sale recorded successfully!');
+        return redirect()->route('shops.pos', $validated['shop_id'])->with('success', 'Sale recorded successfully!');
     }
 
     /**
@@ -110,5 +121,23 @@ class DailySaleController extends Controller
         $pdf = PDF::loadView('sales.report', compact('sales', 'type'));
         return $pdf->download("{$type}_sales_report.pdf");
     }
+
+    public function shopPosPage($shopId)
+    {
+        $shop = \App\Models\Shop::findOrFail($shopId);
+        $customers = \App\Models\Customer::all();
+
+        return view('sales.index', compact('shop', 'customers'));
+    }
+
+    public function pos($shopId)
+    {
+        $customers = Customer::all();
+        $shop = \App\Models\Shop::findOrFail($shopId);
+
+        return view('sales.index', compact('customers', 'shop'));
+    }
+
+
 
 }

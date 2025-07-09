@@ -39,8 +39,9 @@
                             <a class="nav-link" href="{{ route('payments.index') }}">Payments</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="">My Shops</a>
+                            <a class="nav-link" href="{{ route('shops.cards') }}">Shops</a>
                         </li>
+
 
                     @endif
 
@@ -61,6 +62,17 @@
                                 <li><a class="dropdown-item" href="{{ route('sales.report', ['type' => 'non-credit']) }}">Non-Credit Sales</a></li>
                             </ul>
                         </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Settings
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="settingsDropdown">
+                                <li><a class="dropdown-item" href="{{ route('shops.settings') }}">My Shops</a></li>  <!-- ✅ correct route -->
+                                <li><a class="dropdown-item" href="">Taxes</a></li>
+                                <li><a class="dropdown-item" href="">Printers</a></li>
+                            </ul>
+                        </li>
+
                     @endif
                 </ul>
 

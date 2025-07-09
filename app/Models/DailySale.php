@@ -16,6 +16,7 @@ class DailySale extends Model
         'sale_date',
         'month',
         'year',
+        'shop_id',
     ];
 
 

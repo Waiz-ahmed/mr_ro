@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Daily POS Sale')
+@section('title', 'Daily POS Sale - ' . ($shop->name ?? ''))
 
 @section('content')
 <style>
@@ -68,6 +68,7 @@
                         <input type="hidden" name="total_amount" id="formTotal">
                         <input type="hidden" name="item" value="Bottle">
                         <input type="hidden" name="amount" value="80">
+                        <input type="hidden" name="shop_id" value="{{ $shop->id }}">
 
                         <div class="mb-3 mt-3">
                             <label for="customer_id_modal" class="form-label">Customer</label>
