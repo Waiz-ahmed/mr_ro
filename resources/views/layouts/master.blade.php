@@ -29,9 +29,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('customers.index') }}">Customers</a>
                         </li>
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a class="nav-link" href="{{ route('sales.index') }}">Daily Sales</a>
-                        </li>
+                        </li> -->
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('credits.index') }}">Credit Customers</a>
                         </li>
