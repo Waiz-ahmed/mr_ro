@@ -3,114 +3,120 @@
 @section('title', 'Daily POS Sale')
 
 @section('content')
-<h2 class="mb-4">POS Checkout</h2>
+<style>
+    body {
+        background-color: #f7f7f7;
+    }
 
-@if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-@endif
+    .card {
+        border-radius: 12px;
+    }
 
-<form action="{{ route('sales.store') }}" method="POST">
-    @csrf
+    .card-header {
+        font-weight: bold;
+    }
 
-    {{-- Product Info --}}
-    <div class="mb-3">
-        <label class="form-label">Item Name</label>
-        <input type="text" name="item" value="Bottle" class="form-control" readonly>
+    .product-button {
+        max-width: 250px;
+    }
+</style>
+
+<div class="container-fluid min-vh-100 py-4">
+    <div class="row">
+        {{-- Left Side: Single Product UI --}}
+        <div class="col-md-8 mb-4">
+            <div class="d-flex flex-wrap gap-3">
+                <button class="add-to-cart product-button border-0 bg-transparent" data-name="Bottle" data-price="80">
+                    <div class="card shadow-sm">
+                        <img src="/images/bottle.jpg" class="card-img-top p-2" alt="Bottle">
+                    </div>
+                </button>
+                {{-- Add more products here as needed --}}
+            </div>
+        </div>
+
+        {{-- Right Side: Cart Summary --}}
+        <div class="col-md-4">
+            <form method="POST" action="{{ route('sales.store') }}">
+                @csrf
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white">Cart</div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Qty</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cart-body"></tbody>
+                        </table>
+
+                        <div class="mb-2" id="discount-section" style="display: none;">
+                            <label for="discountInput" class="form-label">Discount per Bottle</label>
+                            <input type="number" id="discountInput" name="discount_per_bottle" class="form-control" min="0" value="0">
+                        </div>
+
+                        <p class="mb-1">Subtotal: $<span id="subtotal">0.00</span></p>
+                        <p class="mb-1">Discount: $<span id="discount">0.00</span></p>
+                        <p class="mb-1">VAT (10%): $<span id="vat">0.00</span></p>
+                        <h5>Total: $<span id="total">0.00</span></h5>
+
+                        <input type="hidden" name="quantity" id="formQuantity">
+                        <input type="hidden" name="total_amount" id="formTotal">
+                        <input type="hidden" name="item" value="Bottle">
+                        <input type="hidden" name="amount" value="80">
+
+                        <div class="mb-3 mt-3">
+                            <label for="customer_id_modal" class="form-label">Customer</label>
+                            <div class="input-group">
+                                <select name="customer_id" id="customer_id_modal" class="form-select">
+                                    <option value="">Walk-in Customer</option>
+                                    @foreach($customers as $customer)
+                                        <option value="{{ $customer->id }}">{{ $customer->name }} ({{ $customer->phone }})</option>
+                                    @endforeach
+                                </select>
+                                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">+</button>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input type="checkbox" name="is_credit" value="1" class="form-check-input" id="is_credit">
+                            <label for="is_credit" class="form-check-label">Credit Sale</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">Checkout</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
-    <div class="mb-3">
-        <label class="form-label">Price (per unit)</label>
-        <input type="number" id="unitPrice" name="amount" value="80" class="form-control" readonly>
-    </div>
-
-    {{-- Quantity --}}
-    <div class="mb-3">
-        <label class="form-label">Quantity</label>
-        <input type="number" id="quantity" name="quantity" value="1" class="form-control" min="1" required>
-    </div>
-
-    {{-- Total --}}
-    <div class="mb-3">
-        <label class="form-label">Total Amount</label>
-        <input type="number" id="totalAmount" class="form-control" value="80" readonly>
-        <input type="hidden" name="total_amount" id="hiddenTotal">
-    </div>
-
-    <!-- {{-- Sale Date --}}
-    <div class="mb-3">
-        <label class="form-label">Sale Date</label>
-        <input type="date" name="sale_date" class="form-control" value="{{ date('Y-m-d') }}">
-    </div> -->
-
-    {{-- Credit Customer --}}
-    <div class="mb-3">
-        <label class="form-label">Credit Customer (optional)</label>
-        <select name="customer_id" class="form-select">
-            <option value="">-- Walk-in Customer --</option>
-            @foreach($customers as $customer)
-                <option value="{{ $customer->id }}">{{ $customer->name }} ({{ $customer->phone }})</option>
-            @endforeach
-        </select>
-    </div>
-
-    {{-- Credit Checkbox --}}
-    <div class="form-check mb-4">
-        <input type="checkbox" name="is_credit" value="1" class="form-check-input" id="is_credit">
-        <label for="is_credit" class="form-check-label">Mark as Credit Sale</label>
-    </div>
-
-    <button type="submit" class="btn btn-success">Checkout</button>
-
-    {{-- Payment Button --}}
-    <button type="button" class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#paymentModal">
-        💵 Make Payment
-    </button>
-</form>
-
-{{-- Payment Modal --}}
-<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+{{-- Modal: Add Customer --}}
+<div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form method="POST" action="{{ route('payments.store') }}">
+        <form method="POST" action="{{ route('customers.store') }}" id="addCustomerForm">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="paymentModalLabel">Make Payment</h5>
+                    <h5 class="modal-title">Add New Customer</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
                 <div class="modal-body">
-                    {{-- Customer --}}
                     <div class="mb-3">
-                        <label for="customer_id_modal" class="form-label">Customer</label>
-                        <select name="customer_id" id="customer_id_modal" class="form-select" required>
-                            <option value="">Select Customer</option>
-                            @foreach($customers as $customer)
-                                <option value="{{ $customer->id }}">{{ $customer->name }} ({{ $customer->phone }})</option>
-                            @endforeach
-                        </select>
+                        <label for="customerName" class="form-label">Name</label>
+                        <input type="text" name="name" id="customerName" class="form-control" required>
                     </div>
-
-                    {{-- Amount --}}
                     <div class="mb-3">
-                        <label for="payment_amount" class="form-label">Amount</label>
-                        <input type="number" id="payment_amount" name="amount_paid" class="form-control" required min="1">
-                    </div>
-
-                    {{-- Payment Method --}}
-                    <div class="mb-3">
-                        <label for="payment_method" class="form-label">Payment Method</label>
-                        <select name="payment_method" id="payment_method" class="form-select" required>
-                            <option value="cash">Cash</option>
-                            <option value="bank">Bank</option>
-                            <option value="easypaisa">EasyPaisa</option>
-                            <option value="other">Other</option>
-                        </select>
+                        <label for="customerPhone" class="form-label">Phone</label>
+                        <input type="text" name="phone" id="customerPhone" class="form-control" required>
                     </div>
                 </div>
-
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Submit Payment</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Customer</button>
                 </div>
             </div>
         </form>
@@ -120,20 +126,99 @@
 
 @push('scripts')
 <script>
-    const priceInput = document.getElementById('unitPrice');
-    const quantityInput = document.getElementById('quantity');
-    const totalInput = document.getElementById('totalAmount');
-    const hiddenTotal = document.getElementById('hiddenTotal');
+    const cart = [];
 
-    function calculateTotal() {
-        const qty = parseInt(quantityInput.value) || 0;
-        const price = parseFloat(priceInput.value) || 0;
-        const total = qty * price;
-        totalInput.value = total;
-        hiddenTotal.value = total;
+    function updateCart() {
+        let cartBody = document.getElementById('cart-body');
+        let subtotal = 0;
+        cartBody.innerHTML = '';
+
+        cart.forEach((item, index) => {
+            subtotal += item.price * item.qty;
+            cartBody.innerHTML += `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="changeQty(${index}, -1)">-</button>
+                        ${item.qty}
+                        <button class="btn btn-sm btn-success" onclick="changeQty(${index}, 1)">+</button>
+                    </td>
+                    <td>$${(item.price * item.qty).toFixed(2)}</td>
+                </tr>`;
+        });
+
+        const discountPerBottle = parseFloat(document.getElementById('discountInput')?.value) || 0;
+        const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+        const discount = discountPerBottle * totalQty;
+        const vat = (subtotal - discount) * 0.10;
+        const total = subtotal - discount + vat;
+
+        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+        document.getElementById('discount').textContent = discount.toFixed(2);
+        document.getElementById('vat').textContent = vat.toFixed(2);
+        document.getElementById('total').textContent = total.toFixed(2);
+
+        document.getElementById('formQuantity').value = totalQty;
+        document.getElementById('formTotal').value = total.toFixed(2);
     }
 
-    quantityInput.addEventListener('input', calculateTotal);
-    window.addEventListener('load', calculateTotal);
+    function changeQty(index, delta) {
+        cart[index].qty += delta;
+        if (cart[index].qty <= 0) cart.splice(index, 1);
+        updateCart();
+    }
+
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', () => {
+            const name = button.dataset.name;
+            const price = parseFloat(button.dataset.price);
+            const existing = cart.find(p => p.name === name);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ name, price, qty: 1 });
+            }
+            updateCart();
+        });
+    });
+
+    document.getElementById('customer_id_modal').addEventListener('change', function() {
+        const discountSection = document.getElementById('discount-section');
+        if (this.value) {
+            discountSection.style.display = 'block';
+        } else {
+            discountSection.style.display = 'none';
+            document.getElementById('discountInput').value = 0;
+        }
+        updateCart();
+    });
+
+    document.getElementById('discountInput').addEventListener('input', updateCart);
+
+    // Handle AJAX customer creation and auto-select
+    document.getElementById('addCustomerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.id && data.name) {
+                const option = new Option(`${data.name} (${data.phone})`, data.id, true, true);
+                document.getElementById('customer_id_modal').append(option).value = data.id;
+                document.getElementById('customer_id_modal').dispatchEvent(new Event('change'));
+                document.getElementById('addCustomerModal').querySelector('.btn-close').click();
+                form.reset();
+            }
+        })
+        .catch(err => alert("Error adding customer."));
+    });
 </script>
 @endpush

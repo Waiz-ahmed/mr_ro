@@ -29,7 +29,7 @@ class CustomerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+   public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -37,10 +37,22 @@ class CustomerController extends Controller
             'address' => 'nullable|string|max:255',
         ]);
 
-        Customer::create($request->only('name', 'phone', 'address'));
+        $customer = Customer::create($request->only('name', 'phone', 'address'));
 
+        // 🔽 ADD THIS: respond with JSON for AJAX
+        if ($request->ajax()) {
+            return response()->json([
+                'id' => $customer->id,
+                'name' => $customer->name,
+                'phone' => $customer->phone,
+            ]);
+        }
+
+        // fallback for non-AJAX
         return redirect()->route('customers.index')->with('success', 'Customer added successfully!');
     }
+
+
 
     /**
      * Display the specified resource.

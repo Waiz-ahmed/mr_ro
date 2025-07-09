@@ -38,6 +38,10 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('payments.index') }}">Payments</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="">My Shops</a>
+                        </li>
+
                     @endif
 
                     @if (Auth::user()->role === 'admin')
@@ -83,7 +87,7 @@
     @endauth
 
     {{-- Page content --}}
-    <div class="container mt-4">
+    <div class="container mt-4 vh-100">
         {{-- Display session success/error messages if needed --}}
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>

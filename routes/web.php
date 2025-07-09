@@ -29,6 +29,8 @@ Route::middleware('auth')->group(function () {
     // POS Modules
     // ========================
     Route::resource('customers', CustomerController::class);
+    Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
+
     Route::post('customers/import', [CustomerController::class, 'import'])->name('customers.import');
 
     Route::resource('sales', DailySaleController::class);
