@@ -12,5 +12,12 @@ class Customer extends Model
     protected $fillable = [
         'name', 'email', 'phone', 'address', // your fields
     ];
+
+    // App\Models\Customer.php
+    public function creditCustomers()
+    {
+        return $this->hasMany(\App\Models\CreditCustomer::class);
+    }
+
 }
 

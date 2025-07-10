@@ -33,6 +33,13 @@
                 </button>
                 {{-- Add more products here as needed --}}
             </div>
+
+            <div class="d-flex flex-wrap gap-3">
+                <button class="btn btn-warning mb-3" data-bs-toggle="modal" data-bs-target="#outstandingModal">
+                    Outstanding Balance
+                </button>
+                {{-- Add more products here as needed --}}
+            </div>
         </div>
 
         {{-- Right Side: Cart Summary --}}
@@ -118,6 +125,53 @@
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Add Customer</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="outstandingModal" tabindex="-1" aria-labelledby="outstandingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ route('payments.store') }}">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pay Outstanding Balance</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="customerSelectOutstanding" class="form-label">Select Customer</label>
+                        <select name="customer_id" id="customerSelectOutstanding" class="form-select" required>
+                            <option value="">Select a customer</option>
+                            @foreach(\App\Models\Customer::whereHas('creditCustomers', function ($q) {
+                                $q->where('balance', '>', 0);
+                            })->get() as $customer)
+                                <option value="{{ $customer->id }}">
+                                    {{ $customer->name }} - (Outstanding: {{ number_format($customer->creditCustomers->sum('balance'), 2) }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="amount_paid" class="form-label">Amount</label>
+                        <input type="number" class="form-control" name="amount_paid" id="amount_paid" min="1" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="payment_method" class="form-label">Payment Method</label>
+                        <input type="text" class="form-control" name="payment_method" id="payment_method" placeholder="Cash / Bank" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="note" class="form-label">Note (optional)</label>
+                        <textarea name="note" class="form-control" id="note" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Pay Now</button>
                 </div>
             </div>
         </form>

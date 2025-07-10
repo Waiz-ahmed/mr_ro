@@ -12,6 +12,8 @@ class Payment extends Model
         'amount_paid',
         'payment_method',
         'note',
+        'month', // ✅ Add this
+        'year',
     ];
 
     public function customer()

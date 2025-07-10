@@ -51,6 +51,8 @@ class PaymentController extends Controller
             'payment_method' => $request->payment_method,
             'note'           => $request->note,
             'payment_date'   => now(),
+            'month'          => now()->month,
+            'year'           => now()->year
         ]);
 
         // Auto apply payment to oldest outstanding credits
