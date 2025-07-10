@@ -24,8 +24,8 @@
 <div class="container-fluid min-vh-100 py-4">
     <div class="row">
         {{-- Left Side: Single Product UI --}}
-        <div class="col-md-8 mb-4">
-            <div class="d-flex flex-wrap gap-3">
+        <div class="col-md-6 mb-4 d-flex align-items-center">
+            <div class="flex-wrap gap-3">
                 <button class="add-to-cart product-button border-0 bg-transparent" data-name="Bottle" data-price="80">
                     <div class="card shadow-sm">
                         <img src="/images/bottle.jpg" class="card-img-top p-2" alt="Bottle">
@@ -35,15 +35,17 @@
             </div>
 
             <div class="d-flex flex-wrap gap-3">
-                <button class="btn btn-warning mb-3" data-bs-toggle="modal" data-bs-target="#outstandingModal">
-                    Outstanding Balance
-                </button>
+                <div class="card shadow-sm">
+                    <button class="btn btn-warning product-button" data-bs-toggle="modal" data-bs-target="#outstandingModal">
+                        Outstanding Balance
+                    </button>
+                </div>
                 {{-- Add more products here as needed --}}
             </div>
         </div>
 
         {{-- Right Side: Cart Summary --}}
-        <div class="col-md-4">
+        <div class="col-md-6">
             <form method="POST" action="{{ route('sales.store') }}">
                 @csrf
 
