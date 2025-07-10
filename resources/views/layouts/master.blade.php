@@ -41,7 +41,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('shops.cards') }}">Shops</a>
                         </li>
-
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('sales.index') }}">All Orders</a>  {{-- Ensure this is visible --}}
+                        </li>
 
                     @endif
 

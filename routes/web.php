@@ -52,7 +52,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/my_shops', [ShopController::class, 'store'])->name('shops.cards.store');
     Route::get('/shops/{shop}/pos', [DailySaleController::class, 'shopPosPage'])->name('shops.pos');
     // Route::get('/shops/{shop}/pos', [DailySaleController::class, 'pos'])->name('shops.pos');
-
+    Route::get('/daily-sales/drafts', [DailySaleController::class, 'drafts'])->name('sales.drafts');
+    Route::post('/daily-sales/{id}/finalize', [DailySaleController::class, 'finalize'])->name('sales.finalize');
+    Route::get('/sales', [DailySaleController::class, 'allSales'])->name('sales.index');
+    Route::post('/sales/finalize/{id}', [DailySaleController::class, 'finalizeSale'])->name('sales.finalize');
 
 
 });

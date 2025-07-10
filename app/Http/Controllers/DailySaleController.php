@@ -59,6 +59,7 @@ class DailySaleController extends Controller
         $validated['sale_date'] = Carbon::today();
         $validated['month'] = Carbon::now()->format('F');
         $validated['year'] = Carbon::now()->year;
+        $validated['status'] = 'draft'; // ✅ Important
 
         $sale = DailySale::create($validated);
 
@@ -75,6 +76,57 @@ class DailySaleController extends Controller
 
         return redirect()->route('shops.pos', $validated['shop_id'])->with('success', 'Sale recorded successfully!');
     }
+
+    public function drafts()
+    {
+        $today = Carbon::today();
+
+        $draftSales = DailySale::with('customer')
+            ->whereDate('sale_date', $today)
+            ->where('status', 'draft')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('sales.drafts', compact('draftSales'));
+    }
+
+    public function finalize($id)
+    {
+        $sale = DailySale::findOrFail($id);
+        $sale->status = 'finalized';
+        $sale->save();
+
+        return redirect()->route('sales.drafts')->with('success', 'Order marked as done.');
+    }
+    public function finalizeSale($id)
+    {
+        $sale = DailySale::findOrFail($id);
+
+        // Only allow the status change if it's currently in 'draft'
+        if ($sale->status == 'draft') {
+            $sale->status = 'finalized';
+            $sale->save();
+
+            return redirect()->route('sales.index')->with('success', 'Order has been finalized!');
+        }
+
+        return redirect()->route('sales.index')->with('error', 'This order is already finalized.');
+    }
+
+
+    public function allSales()
+    {
+        // Get all sales with the associated shop and customer
+        $allSales = DailySale::with('shop', 'customer') // eager load the shop and customer relationships
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('sales.all', compact('allSales'));
+    }
+
+
+
+
 
     /**
      * Display the specified resource.
