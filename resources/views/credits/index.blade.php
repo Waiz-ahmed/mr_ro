@@ -3,18 +3,20 @@
 @section('title', 'Credit Customers')
 
 @section('content')
-<h2 class="mb-4">Outstanding Balances</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Outstanding Balances</h2>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Customer</th>
-            <th>Total Outstanding</th>
-        </tr>
-    </thead>
-    <tbody>
-        @forelse ($groupedCredits as $credit)
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Customer</th>
+                <th>Total Outstanding</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($groupedCredits as $credit)
             <tr>
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $credit->customer->name }} ({{ $credit->customer->phone }})</td>
@@ -23,11 +25,12 @@
                     <a href="{{ route('credits.invoice', $credit->customer_id) }}" class="btn btn-sm btn-info">Create Invoice</a>
                 </td>
             </tr>
-        @empty
+            @empty
             <tr>
                 <td colspan="3" class="text-center text-muted">No outstanding credits found.</td>
             </tr>
-        @endforelse
-    </tbody>
-</table>
+            @endforelse
+        </tbody>
+    </table>
+</div>
 @endsection
