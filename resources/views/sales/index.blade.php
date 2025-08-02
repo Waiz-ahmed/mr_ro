@@ -21,6 +21,12 @@
     }
 </style>
 <div class="d-flex justify-content-end gap-3 mb-3">
+    <a href="{{ route('credits.index') }}" class="btn btn-primary">
+        Credit Customers List
+    </a>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+        Add Expense
+    </button>
     <a href="{{ route('sales.index') }}" class="btn btn-primary">
         All Orders
     </a>
@@ -52,10 +58,16 @@
                     Order Summary
                 </div>
                 <div class="card-body">
-                    <p class="mb-1">Subtotal: $<span id="subtotal">0.00</span></p>
-                    <p class="mb-1">Discount: $<span id="discount">0.00</span></p>
-                    <p class="mb-1">VAT (10%): $<span id="vat">0.00</span></p>
-                    <h5>Total: $<span id="total">0.00</span></h5>
+                    <div class="d-flex flex-row justify-content-between">
+                        <span class="mb-1">Subtotal: $<span id="subtotal">0.00</span></span>
+                        <span class="mb-1">Discount: $<span id="discount">0.00</span></span>
+                        <span class="mb-1">VAT (10%): $<span id="vat">0.00</span></span>
+                    </div>
+                    <hr class="mx-0 my-0">
+                    <div class="d-flex flex-row fw-bold justify-content-end">
+                        <span class="mb-1">Total: $<span id="total">0.00</span></span>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -196,6 +208,7 @@
         </form>
     </div>
 </div>
+@include('expenses.partials.expense_modal')
 @endsection
 
 @push('scripts')
