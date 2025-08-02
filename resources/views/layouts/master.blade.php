@@ -9,6 +9,25 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     @stack('styles')
+
+    <style>
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+    </style>
 </head>
 <body>
 
@@ -24,14 +43,11 @@
             </button>
 
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     @if (in_array(Auth::user()->role, ['admin', 'staff']))
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('customers.index') }}">Customers</a>
                         </li>
-                        <!-- <li class="nav-item">
-                            <a class="nav-link" href="{{ route('sales.index') }}">Daily Sales</a>
-                        </li> -->
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('credits.index') }}">Credit Customers</a>
                         </li>
@@ -42,9 +58,8 @@
                             <a class="nav-link" href="{{ route('shops.cards') }}">Shops</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('sales.index') }}">All Orders</a>  {{-- Ensure this is visible --}}
+                            <a class="nav-link" href="{{ route('sales.index') }}">All Orders</a>
                         </li>
-
                     @endif
 
                     @if (Auth::user()->role === 'admin')
@@ -64,25 +79,23 @@
                                 <li><a class="dropdown-item" href="{{ route('sales.report', ['type' => 'non-credit']) }}">Non-Credit Sales</a></li>
                             </ul>
                         </li>
+
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown">
                                 Settings
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="settingsDropdown">
-                                <li><a class="dropdown-item" href="{{ route('shops.settings') }}">My Shops</a></li>  <!-- ✅ correct route -->
-                                <li><a class="dropdown-item" href="">Taxes</a></li>
-                                <li><a class="dropdown-item" href="">Printers</a></li>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ route('shops.settings') }}">My Shops</a></li>
+                                <li><a class="dropdown-item" href="#">Taxes</a></li>
+                                <li><a class="dropdown-item" href="#">Printers</a></li>
                             </ul>
                         </li>
-
                     @endif
                 </ul>
 
-                {{-- User dropdown --}}
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown"
-                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                             {{ Auth::user()->name }} ({{ Auth::user()->role }})
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
@@ -101,8 +114,8 @@
     @endauth
 
     {{-- Page content --}}
-    <div class="container mt-4 vh-100">
-        {{-- Display session success/error messages if needed --}}
+    <div class="main-content container-fluid py-4">
+        {{-- Session flash messages --}}
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
@@ -111,11 +124,11 @@
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
-        {{-- Page content from child views --}}
+        {{-- Blade section content --}}
         @yield('content')
     </div>
 
-    <footer class="text-center mt-4 mb-2 text-muted">
+    <footer class="text-center text-muted py-3 bg-light border-top">
         &copy; {{ date('Y') }} POS System
     </footer>
 

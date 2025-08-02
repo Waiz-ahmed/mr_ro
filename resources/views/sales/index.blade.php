@@ -20,8 +20,19 @@
         max-width: 250px;
     }
 </style>
+<div class="d-flex justify-content-end gap-3 mb-3">
+    <a href="{{ route('sales.index') }}" class="btn btn-primary">
+        All Orders
+    </a>
+    <div class="card shadow-sm">
+        <button class="btn btn-warning product-button" data-bs-toggle="modal" data-bs-target="#outstandingModal">
+            Outstanding Balance
+        </button>
+    </div>
+</div>
+<div class="container-fluid min-vh-50 py-4">
 
-<div class="container-fluid min-vh-100 py-4">
+
     <div class="row">
         {{-- Left Side: Single Product UI --}}
         <div class="col-md-6 mb-4 d-flex align-items-center">
@@ -34,14 +45,14 @@
                 {{-- Add more products here as needed --}}
             </div>
 
-            <div class="d-flex flex-wrap gap-3">
+            <!-- <div class="d-flex flex-wrap gap-3">
                 <div class="card shadow-sm">
                     <button class="btn btn-warning product-button" data-bs-toggle="modal" data-bs-target="#outstandingModal">
                         Outstanding Balance
                     </button>
                 </div>
                 {{-- Add more products here as needed --}}
-            </div>
+            </div> -->
         </div>
 
         {{-- Right Side: Cart Summary --}}
@@ -85,7 +96,7 @@
                                 <select name="customer_id" id="customer_id_modal" class="form-select">
                                     <option value="">Walk-in Customer</option>
                                     @foreach($customers as $customer)
-                                        <option value="{{ $customer->id }}">{{ $customer->name }} ({{ $customer->phone }})</option>
+                                    <option value="{{ $customer->id }}">{{ $customer->name }} ({{ $customer->phone }})</option>
                                     @endforeach
                                 </select>
                                 <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">+</button>
@@ -148,11 +159,11 @@
                         <select name="customer_id" id="customerSelectOutstanding" class="form-select" required>
                             <option value="">Select a customer</option>
                             @foreach(\App\Models\Customer::whereHas('creditCustomers', function ($q) {
-                                $q->where('balance', '>', 0);
+                            $q->where('balance', '>', 0);
                             })->get() as $customer)
-                                <option value="{{ $customer->id }}">
-                                    {{ $customer->name }} - (Outstanding: {{ number_format($customer->creditCustomers->sum('balance'), 2) }})
-                                </option>
+                            <option value="{{ $customer->id }}">
+                                {{ $customer->name }} - (Outstanding: {{ number_format($customer->creditCustomers->sum('balance'), 2) }})
+                            </option>
                             @endforeach
                         </select>
                     </div>
@@ -233,7 +244,11 @@
             if (existing) {
                 existing.qty++;
             } else {
-                cart.push({ name, price, qty: 1 });
+                cart.push({
+                    name,
+                    price,
+                    qty: 1
+                });
             }
             updateCart();
         });
@@ -259,23 +274,23 @@
         const formData = new FormData(form);
 
         fetch(form.action, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-            },
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.id && data.name) {
-                const option = new Option(`${data.name} (${data.phone})`, data.id, true, true);
-                document.getElementById('customer_id_modal').append(option).value = data.id;
-                document.getElementById('customer_id_modal').dispatchEvent(new Event('change'));
-                document.getElementById('addCustomerModal').querySelector('.btn-close').click();
-                form.reset();
-            }
-        })
-        .catch(err => alert("Error adding customer."));
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.id && data.name) {
+                    const option = new Option(`${data.name} (${data.phone})`, data.id, true, true);
+                    document.getElementById('customer_id_modal').append(option).value = data.id;
+                    document.getElementById('customer_id_modal').dispatchEvent(new Event('change'));
+                    document.getElementById('addCustomerModal').querySelector('.btn-close').click();
+                    form.reset();
+                }
+            })
+            .catch(err => alert("Error adding customer."));
     });
 </script>
 @endpush

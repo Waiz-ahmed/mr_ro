@@ -21,7 +21,7 @@
                         <h5 class="card-title">{{ $shop->name }}</h5>
                         <p class="card-text text-muted">{{ $shop->location ?? 'No location' }}</p>
                         <p class="small text-end text-secondary">{{ $shop->created_at->diffForHumans() }}</p>
-                        <a href="{{ route('shops.pos', $shop->id) }}">Go to POS</a>
+                        <a href="{{ route('shops.pos', $shop->id) }}"> <button class="btn btn-primary">Go to POS</button></a>
                     </div>
                 </div>
             </div>
