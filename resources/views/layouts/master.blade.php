@@ -9,6 +9,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css" />
     @stack('styles')
 
     <style>
@@ -47,7 +48,11 @@
     @auth
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url('/') }}">POS System</a>
+            <a class="navbar-brand" href="{{ url('/') }}">
+                <!-- <img src="{{ asset('images/mr_ro_logo.jpg') }}" alt="Logo" style="height: 50px; width: auto; vertical-align: middle;"> -->
+                <span style="margin-left: 8px;">POS System</span>
+            </a>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
                 aria-label="Toggle navigation">
