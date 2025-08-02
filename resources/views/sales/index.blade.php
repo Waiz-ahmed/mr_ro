@@ -35,25 +35,31 @@
 
     <div class="row">
         {{-- Left Side: Single Product UI --}}
-        <div class="col-md-6 mb-4 d-flex align-items-center">
-            <div class="flex-wrap gap-3">
+        <div class="col-md-6 mb-4">
+            {{-- Products --}}
+            <div class="d-flex flex-wrap gap-3">
                 <button class="add-to-cart product-button border-0 bg-transparent" data-name="Bottle" data-price="80">
                     <div class="card shadow-sm">
                         <img src="/images/bottle.jpg" class="card-img-top p-2" alt="Bottle">
                     </div>
                 </button>
-                {{-- Add more products here as needed --}}
+                {{-- Add more products here --}}
             </div>
 
-            <!-- <div class="d-flex flex-wrap gap-3">
-                <div class="card shadow-sm">
-                    <button class="btn btn-warning product-button" data-bs-toggle="modal" data-bs-target="#outstandingModal">
-                        Outstanding Balance
-                    </button>
+            {{-- Summary Card --}}
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-secondary text-white">
+                    Order Summary
                 </div>
-                {{-- Add more products here as needed --}}
-            </div> -->
+                <div class="card-body">
+                    <p class="mb-1">Subtotal: $<span id="subtotal">0.00</span></p>
+                    <p class="mb-1">Discount: $<span id="discount">0.00</span></p>
+                    <p class="mb-1">VAT (10%): $<span id="vat">0.00</span></p>
+                    <h5>Total: $<span id="total">0.00</span></h5>
+                </div>
+            </div>
         </div>
+
 
         {{-- Right Side: Cart Summary --}}
         <div class="col-md-6">
@@ -79,10 +85,10 @@
                             <input type="number" id="discountInput" name="discount_per_bottle" class="form-control" min="0" value="0">
                         </div>
 
-                        <p class="mb-1">Subtotal: $<span id="subtotal">0.00</span></p>
+                        <!-- <p class="mb-1">Subtotal: $<span id="subtotal">0.00</span></p>
                         <p class="mb-1">Discount: $<span id="discount">0.00</span></p>
                         <p class="mb-1">VAT (10%): $<span id="vat">0.00</span></p>
-                        <h5>Total: $<span id="total">0.00</span></h5>
+                        <h5>Total: $<span id="total">0.00</span></h5> -->
 
                         <input type="hidden" name="quantity" id="formQuantity">
                         <input type="hidden" name="total_amount" id="formTotal">
