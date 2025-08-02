@@ -74,7 +74,7 @@ class DailySaleController extends Controller
             ]);
         }
 
-        return redirect()->route('shops.pos', $validated['shop_id'])->with('success', 'Sale recorded successfully!');
+        return redirect()->route('shops.pos', $validated['shop_id']);
     }
 
     public function drafts()

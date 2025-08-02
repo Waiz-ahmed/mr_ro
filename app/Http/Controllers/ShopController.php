@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Shop;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ShopController extends Controller
 {
@@ -26,9 +27,13 @@ class ShopController extends Controller
             'location' => 'nullable|string|max:255',
         ]);
 
-        Shop::create($request->only('name', 'location'));
+        Shop::create([
+            'name' => $request->name,
+            'location' => $request->location,
+            'user_id' => Auth::id(), // ✅ Link shop to current user
+        ]);
 
-        return redirect()->route('shops.cards')->with('success', 'Shop created successfully!');
+        return redirect()->route('shops.cards');
     }
 
     /**

@@ -8,6 +8,7 @@ use App\Http\Controllers\CreditCustomerController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ShopController;
 
 // Redirect root to dashboard
@@ -45,10 +46,10 @@ Route::middleware('auth')->group(function () {
     // Current card view for main navbar
     Route::get('/my_shops', [ShopController::class, 'myShops'])->name('shops.cards');
 
-// New settings page for managing shops
+    // New settings page for managing shops
     Route::get('/settings/shops', [ShopController::class, 'settingsShops'])->name('shops.settings');
 
-// Still using same store method
+    // Still using same store method
     Route::post('/my_shops', [ShopController::class, 'store'])->name('shops.cards.store');
     Route::get('/shops/{shop}/pos', [DailySaleController::class, 'shopPosPage'])->name('shops.pos');
     // Route::get('/shops/{shop}/pos', [DailySaleController::class, 'pos'])->name('shops.pos');
@@ -57,8 +58,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/sales', [DailySaleController::class, 'allSales'])->name('sales.index');
     Route::post('/sales/finalize/{id}', [DailySaleController::class, 'finalizeSale'])->name('sales.finalize');
 
+    Route::get('/shops/{shop}/fbr/edit', [\App\Http\Controllers\FbrSettingController::class, 'edit'])
+        ->name('shops.fbr.edit');
+
+    Route::post('/shops/{shop}/fbr', [\App\Http\Controllers\FbrSettingController::class, 'storeOrUpdate'])
+        ->name('shops.fbr.update');
+    // Route::middleware(['auth'])->group(function () {
+    Route::get('/settings/general/{shopId?}', [SettingController::class, 'general'])->name('settings.general');
+    Route::post('/settings/general/{shopId}', [SettingController::class, 'updateGeneral'])->name('settings.general.update');
+    // });
+
 
 });
 
 // Include Breeze default auth routes (login, register, etc.)
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

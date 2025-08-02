@@ -10,7 +10,7 @@
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
     <table class="table table-bordered table-striped">
@@ -19,19 +19,39 @@
                 <th>Name</th>
                 <th>Location</th>
                 <th>Created</th>
+                <th>Actions</th>
+                <th>FBR Status</th>
             </tr>
         </thead>
         <tbody>
             @forelse($shops as $shop)
-                <tr>
-                    <td>{{ $shop->name }}</td>
-                    <td>{{ $shop->location ?? '—' }}</td>
-                    <td>{{ $shop->created_at->diffForHumans() }}</td>
-                </tr>
+            <tr>
+                <td>{{ $shop->name }}</td>
+                <td>{{ $shop->location ?? '—' }}</td>
+                <td>{{ $shop->created_at->diffForHumans() }}</td>
+                <td>
+                    @if($shop->fbrSetting?->enabled)
+                        <a href="{{ route('settings.general', $shop->id) }}" class="btn btn-sm btn-outline-primary">
+                            Edit FBR Settings
+                        </a>
+                    @else
+                        <a href="{{ route('settings.general', $shop->id) }}" class="btn btn-sm btn-outline-secondary">
+                            Manage FBR
+                        </a>
+                    @endif
+                </td>
+                <td>
+                    @if($shop->fbrSetting?->enabled)
+                    <span class="badge bg-success">FBR Enabled</span>
+                    @else
+                    <span class="badge bg-secondary">FBR Disabled</span>
+                    @endif
+                </td>
+            </tr>
             @empty
-                <tr>
-                    <td colspan="3" class="text-center">No shops found.</td>
-                </tr>
+            <tr>
+                <td colspan="3" class="text-center">No shops found.</td>
+            </tr>
             @endforelse
         </tbody>
     </table>

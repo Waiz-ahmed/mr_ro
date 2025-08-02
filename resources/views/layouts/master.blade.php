@@ -85,6 +85,7 @@
                                 Settings
                             </a>
                             <ul class="dropdown-menu">
+                                        <!-- <li><a class="dropdown-item" href="{{ route('settings.general') }}">General Settings</a></li> {{-- ✅ --}} -->
                                 <li><a class="dropdown-item" href="{{ route('shops.settings') }}">My Shops</a></li>
                                 <li><a class="dropdown-item" href="#">Taxes</a></li>
                                 <li><a class="dropdown-item" href="#">Printers</a></li>
