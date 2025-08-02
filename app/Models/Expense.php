@@ -14,6 +14,7 @@ class Expense extends Model
         'vendor_id',
         'description',
         'amount',
+        'shop_id',
     ];
 
     public function vendor()

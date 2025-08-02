@@ -2,8 +2,9 @@
 
 <div class="modal fade" id="addExpenseModal" tabindex="-1" aria-labelledby="addExpenseModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form id="expenseForm" method="POST" action="{{ route('expenses.store') }}">
+        <form id="addExpenseForm" method="POST" action="{{ route('expenses.store') }}">
             @csrf
+            <input type="hidden" name="shop_id" id="shop_id_field" value="{{ $shop->id }}">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add Expense</h5>

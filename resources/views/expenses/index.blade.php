@@ -50,8 +50,8 @@
 @endsection
 @push('scripts')
 <script>
-    document.getElementById('expenseForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+    document.getElementById('addExpenseForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // prevent normal form submit
 
         const form = e.target;
         const formData = new FormData(form);
@@ -65,12 +65,18 @@
             })
             .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
+                return response.json(); // assuming your backend returns json
             })
             .then(data => {
                 if (data.success) {
-                    // Redirect to the given URL
-                    window.location.href = data.redirect;
+                    // Close the modal by clicking the close button
+                    document.querySelector('#addExpenseModal .btn-close').click();
+
+                    // Reset the form
+                    form.reset();
+
+                    // Optional: show success message
+                    alert('Expense saved successfully!');
                 } else {
                     alert('Failed to save expense.');
                 }

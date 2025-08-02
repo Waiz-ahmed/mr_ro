@@ -34,19 +34,13 @@ class ExpenseController extends Controller
             'expense_date' => 'required|date',
             'description' => 'required|string',
             'amount' => 'required|numeric',
+            'shop_id' => 'required|exists:shops,id',
         ]);
 
         Expense::create($validated);
 
-        // Return redirect URL in JSON
-        $redirectUrl = route('shops.pos', ['shop' => 6]); // replace 6 with dynamic shop id if needed
-
-        return response()->json([
-            'success' => true,
-            'redirect' => $redirectUrl,
-        ]);
+        return redirect()->route('shops.pos', $validated['shop_id']);
     }
-
 
 
     /**
