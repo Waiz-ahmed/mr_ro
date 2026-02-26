@@ -6,136 +6,317 @@
 <style>
     body {
         background-color: #f7f7f7;
+        overflow: hidden;
     }
 
-    .card {
-        border-radius: 12px;
+    .pos-container {
+        height: calc(100vh - 120px);
+        max-height: 500px;
+        overflow: hidden;
+        padding: 12px;
     }
 
-    .card-header {
-        font-weight: bold;
+    .pos-row {
+        height: 100%;
+        display: flex;
+        gap: 15px;
+    }
+
+    .pos-left-panel {
+        width: 40%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        height: 83%;
+        overflow: hidden;
+    }
+
+    .pos-right-panel {
+        width: 60%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    /* Action Buttons Bar */
+    .action-bar {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding: 8px 12px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .action-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+        border-radius: 6px;
+        white-space: nowrap;
+    }
+
+    /* Products Grid */
+    .products-grid {
+        background: white;
+        border-radius: 8px;
+        padding: 12px;
+        height: calc(100% - 120px);
+        overflow-y: auto;
+    }
+
+    .products-grid .d-flex {
+        gap: 12px;
     }
 
     .product-button {
-        max-width: 250px;
+        width: 110px;
+        flex-shrink: 0;
+    }
+
+    .product-button .card {
+        transition: transform 0.2s;
+        cursor: pointer;
+    }
+
+    .product-button .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+    }
+
+    .product-button img {
+        height: 80px;
+        object-fit: contain;
+    }
+
+    /* Summary Card */
+    .summary-card {
+        background: white;
+        border-radius: 8px;
+        padding: 12px;
+        flex-shrink: 0;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+    /* Cart Section */
+    .cart-card {
+        background: white;
+        border-radius: 8px;
+        height: 85%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .cart-header {
+        padding: 12px;
+        background: #2c3e50;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .cart-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px;
+    }
+
+    .cart-table {
+        width: 100%;
+        font-size: 13px;
+    }
+
+    .cart-table th {
+        background: #f8f9fa;
+        padding: 8px;
+        font-weight: 600;
+    }
+
+    .cart-table td {
+        padding: 8px;
+        vertical-align: middle;
+    }
+
+    .qty-btn {
+        padding: 2px 8px;
+        font-size: 12px;
+        line-height: 1;
+    }
+
+    .cart-footer {
+        padding: 12px;
+        background: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+    }
+
+    /* Form Elements */
+    .form-control-sm-custom {
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .discount-section {
+        background: #fff3cd;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+    }
+
+    /* Modals - ensure they don't affect main container height */
+    .modal-content {
+        max-height: 80vh;
+        overflow-y: auto;
     }
 </style>
-<div class="d-flex justify-content-end gap-3 mb-3">
-    <a href="{{ route('credits.index') }}" class="btn btn-primary">
-        Credit Customers List
-    </a>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
-        Add Expense
-    </button>
-    <a href="{{ route('sales.index') }}" class="btn btn-primary">
-        All Orders
-    </a>
-    <div class="card shadow-sm">
-        <button class="btn btn-warning product-button" data-bs-toggle="modal" data-bs-target="#outstandingModal">
-            Outstanding Balance
+
+<div class="pos-container">
+    <!-- Action Buttons -->
+    <div class="action-bar mb-2 align-items-center">
+        <a href="{{ route('credits.index') }}" class="btn btn-primary action-btn">
+            Credit Customers
+        </a>
+        <button class="btn btn-primary action-btn" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+            Add Expense
         </button>
+        <a href="{{ route('sales.index') }}" class="btn btn-primary action-btn">
+            All Orders
+        </a>
+        <button class="btn btn-warning action-btn" data-bs-toggle="modal" data-bs-target="#outstandingModal">
+            Outstanding Balance: ({{ number_format(\App\Models\CreditCustomer::sum('balance'), 0) }})
+        </button>
+
+        <div id="selectedCustomerBalanceBox"
+            class="px-3 py-2 bg-light border rounded"
+            style="min-width:200px;">
+            <small class="text-muted">Customer Outstanding</small>
+            <div class="fw-bold text-danger">
+                Rs. <span id="selectedCustomerBalance">0</span>
+            </div>
+        </div>
     </div>
-</div>
-<div class="container-fluid min-vh-50 py-4">
 
-
-    <div class="row">
-        {{-- Left Side: Single Product UI --}}
-        <div class="col-md-6 mb-4">
-            {{-- Products --}}
-            <div class="d-flex flex-wrap gap-3">
-                <button class="add-to-cart product-button border-0 bg-transparent" data-name="Bottle" data-price="80">
-                    <div class="card shadow-sm">
-                        <img src="/images/bottle.jpg" class="card-img-top p-2" alt="Bottle">
-                    </div>
-                </button>
-                {{-- Add more products here --}}
+    <!-- Main POS Row -->
+    <div class="pos-row">
+        <!-- Left Panel - Products & Summary -->
+        <div class="pos-left-panel">
+            <!-- Products Grid -->
+            <div class="products-grid">
+                <h6 class="mb-2" style="font-size: 14px;">Products</h6>
+                <div class="d-flex flex-wrap">
+                    <button class="add-to-cart product-button border-0 bg-transparent" data-name="Bottle" data-price="80">
+                        <div class="card shadow-sm">
+                            <img src="/images/bottle.jpg" class="card-img-top p-2" alt="Bottle">
+                            <div class="card-body p-2 text-center">
+                                <small>Bottle</small>
+                                <strong>$80</strong>
+                            </div>
+                        </div>
+                    </button>
+                    <!-- Add more products here -->
+                </div>
             </div>
 
-            {{-- Summary Card --}}
-            <div class="card shadow-sm mt-4">
-                <div class="card-header bg-secondary text-white">
-                    Order Summary
+            <!-- Summary Card -->
+            <div class="summary-card">
+                <h6 class="mb-2" style="font-size: 14px;">Order Summary</h6>
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span>$<span id="subtotal">0.00</span></span>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex flex-row justify-content-between">
-                        <span class="mb-1">Subtotal: $<span id="subtotal">0.00</span></span>
-                        <span class="mb-1">Discount: $<span id="discount">0.00</span></span>
-                        <span class="mb-1">VAT (10%): $<span id="vat">0.00</span></span>
-                    </div>
-                    <hr class="mx-0 my-0">
-                    <div class="d-flex flex-row fw-bold justify-content-end">
-                        <span class="mb-1">Total: $<span id="total">0.00</span></span>
-                    </div>
-
+                <div class="summary-row">
+                    <span>Discount:</span>
+                    <span>$<span id="discount">0.00</span></span>
+                </div>
+                <div class="summary-row">
+                    <span>VAT (10%):</span>
+                    <span>$<span id="vat">0.00</span></span>
+                </div>
+                <hr class="my-1">
+                <div class="summary-row fw-bold">
+                    <span>Total:</span>
+                    <span>$<span id="total">0.00</span></span>
                 </div>
             </div>
         </div>
 
-
-        {{-- Right Side: Cart Summary --}}
-        <div class="col-md-6">
-            <form method="POST" action="{{ route('sales.store') }}">
-                @csrf
-
-                <div class="card shadow-sm">
-                    <div class="card-header bg-dark text-white">Cart</div>
-                    <div class="card-body">
-                        <table class="table table-bordered table-sm">
+        <!-- Right Panel - Cart -->
+        <div class="pos-right-panel">
+            <div class="cart-card">
+                <div class="cart-header">
+                    Shopping Cart
+                </div>
+                
+                <div class="cart-body">
+                    <form method="POST" action="{{ route('sales.store') }}" id="posForm">
+                        @csrf
+                        <table class="cart-table">
                             <thead>
                                 <tr>
                                     <th>Product</th>
-                                    <th>Qty</th>
-                                    <th>Price</th>
+                                    <th style="width: 100px;">Quantity</th>
+                                    <th style="width: 80px;">Price</th>
                                 </tr>
                             </thead>
                             <tbody id="cart-body"></tbody>
                         </table>
 
-                        <div class="mb-2" id="discount-section" style="display: none;">
-                            <label for="discountInput" class="form-label">Discount per Bottle</label>
-                            <input type="number" id="discountInput" name="discount_per_bottle" class="form-control" min="0" value="0">
+                        <!-- Discount Section (shown when customer selected) -->
+                        <div id="discount-section" style="display: none;" class="discount-section mt-2">
+                            <label for="discountInput" class="form-label small mb-1">Discount per Bottle</label>
+                            <input type="number" id="discountInput" name="discount_per_bottle" class="form-control form-control-sm-custom" min="0" value="0">
                         </div>
 
-                        <!-- <p class="mb-1">Subtotal: $<span id="subtotal">0.00</span></p>
-                        <p class="mb-1">Discount: $<span id="discount">0.00</span></p>
-                        <p class="mb-1">VAT (10%): $<span id="vat">0.00</span></p>
-                        <h5>Total: $<span id="total">0.00</span></h5> -->
-
+                        <!-- Hidden Inputs -->
                         <input type="hidden" name="quantity" id="formQuantity">
                         <input type="hidden" name="total_amount" id="formTotal">
                         <input type="hidden" name="item" value="Bottle">
                         <input type="hidden" name="amount" value="80">
                         <input type="hidden" name="shop_id" value="{{ $shop->id }}">
 
-                        <div class="mb-3 mt-3">
-                            <label for="customer_id_modal" class="form-label">Customer</label>
-                            <div class="input-group">
-                                <select name="customer_id" id="customer_id_modal" class="form-select">
+                        <!-- Customer Selection -->
+                        <div class="mb-2 mt-3">
+                            <label for="customer_id_modal" class="form-label small">Customer</label>
+                            <div class="input-group input-group-sm">
+                                <select name="customer_id" id="customer_id_modal" class="form-select form-select-sm">
                                     <option value="">Walk-in Customer</option>
                                     @foreach($customers as $customer)
-                                    <option value="{{ $customer->id }}">{{ $customer->name }} ({{ $customer->phone }})</option>
+                                    <option value="{{ $customer->id }}"
+                                            data-balance="{{ $customer->creditCustomers->sum('balance') }}">
+                                        {{ $customer->name }} ({{ $customer->phone }})
+                                    </option>
                                     @endforeach
                                 </select>
-                                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">+</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addCustomerModal">+</button>
                             </div>
                         </div>
 
-                        <div class="form-check mb-4">
+                        <!-- Credit Sale Checkbox -->
+                        <div class="form-check mb-3">
                             <input type="checkbox" name="is_credit" value="1" class="form-check-input" id="is_credit">
-                            <label for="is_credit" class="form-check-label">Credit Sale</label>
+                            <label for="is_credit" class="form-check-label small">Credit Sale</label>
                         </div>
-
-                        <button type="submit" class="btn btn-success w-100">Checkout</button>
-                    </div>
+                    </form>
                 </div>
-            </form>
+
+                <div class="cart-footer">
+                    <button type="submit" form="posForm" class="btn btn-success w-100">
+                        Checkout ($<span id="total-display">0.00</span>)
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-{{-- Modal: Add Customer --}}
+{{-- Modals (unchanged) --}}
 <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+    <!-- Modal content unchanged -->
     <div class="modal-dialog">
         <form method="POST" action="{{ route('customers.store') }}" id="addCustomerForm">
             @csrf
@@ -163,6 +344,7 @@
 </div>
 
 <div class="modal fade" id="outstandingModal" tabindex="-1" aria-labelledby="outstandingModalLabel" aria-hidden="true">
+    <!-- Modal content unchanged -->
     <div class="modal-dialog">
         <form method="POST" action="{{ route('payments.store') }}">
             @csrf
@@ -208,6 +390,7 @@
         </form>
     </div>
 </div>
+
 @include('expenses.partials.expense_modal')
 @endsection
 
@@ -226,9 +409,11 @@
                 <tr>
                     <td>${item.name}</td>
                     <td>
-                        <button class="btn btn-sm btn-danger" onclick="changeQty(${index}, -1)">-</button>
-                        ${item.qty}
-                        <button class="btn btn-sm btn-success" onclick="changeQty(${index}, 1)">+</button>
+                        <div class="d-flex align-items-center gap-1">
+                            <button class="btn btn-danger qty-btn" onclick="changeQty(${index}, -1)">-</button>
+                            <span class="mx-1">${item.qty}</span>
+                            <button class="btn btn-success qty-btn" onclick="changeQty(${index}, 1)">+</button>
+                        </div>
                     </td>
                     <td>$${(item.price * item.qty).toFixed(2)}</td>
                 </tr>`;
@@ -244,6 +429,7 @@
         document.getElementById('discount').textContent = discount.toFixed(2);
         document.getElementById('vat').textContent = vat.toFixed(2);
         document.getElementById('total').textContent = total.toFixed(2);
+        document.getElementById('total-display').textContent = total.toFixed(2);
 
         document.getElementById('formQuantity').value = totalQty;
         document.getElementById('formTotal').value = total.toFixed(2);
@@ -305,11 +491,28 @@
                     const option = new Option(`${data.name} (${data.phone})`, data.id, true, true);
                     document.getElementById('customer_id_modal').append(option).value = data.id;
                     document.getElementById('customer_id_modal').dispatchEvent(new Event('change'));
-                    document.getElementById('addCustomerModal').querySelector('.btn-close').click();
+                    
+                    // Close modal and reset form
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addCustomerModal'));
+                    modal.hide();
                     form.reset();
                 }
             })
             .catch(err => alert("Error adding customer."));
+    });
+
+    document.getElementById('customer_id_modal').addEventListener('change', function () {
+
+        const balanceText = document.getElementById('selectedCustomerBalance');
+
+        if (this.value) {
+            const selectedOption = this.options[this.selectedIndex];
+            const balance = parseFloat(selectedOption.dataset.balance || 0);
+            balanceText.textContent = balance.toLocaleString();
+        } else {
+            balanceText.textContent = "0";
+        }
+
     });
 </script>
 @endpush

@@ -114,12 +114,48 @@ class DailySaleController extends Controller
     }
 
 
-    public function allSales()
+    public function allSales(Request $request)
     {
-        // Get all sales with the associated shop and customer
-        $allSales = DailySale::with('shop', 'customer') // eager load the shop and customer relationships
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = DailySale::with('shop', 'customer')
+            ->orderBy('created_at', 'desc');
+
+        // ✅ Date Filter
+        if ($request->from_date && $request->to_date) {
+            $query->whereBetween('sale_date', [
+                $request->from_date,
+                $request->to_date
+            ]);
+        }
+
+        // ✅ Table Search (searches across multiple columns)
+        if ($request->search) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('item', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('quantity', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('amount', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('total_amount', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('sale_date', 'LIKE', "%{$searchTerm}%")
+                // Wrap relationship queries in nested closures
+                ->orWhere(function ($subQuery) use ($searchTerm) {
+                    $subQuery->whereHas('customer', function ($customerQuery) use ($searchTerm) {
+                        $customerQuery->where('name', 'LIKE', "%{$searchTerm}%");
+                    });
+                })
+                ->orWhere(function ($subQuery) use ($searchTerm) {
+                    $subQuery->whereHas('shop', function ($shopQuery) use ($searchTerm) {
+                        $shopQuery->where('name', 'LIKE', "%{$searchTerm}%");
+                    });
+                })
+                ->orWhere(function ($subQuery) use ($searchTerm) {
+                    $subQuery->whereNull('customer_id')
+                            ->whereRaw("LOWER('Walk-in') LIKE ?", ["%".strtolower($searchTerm)."%"]);
+                });
+            });
+        }
+
+        // ✅ Paginate results
+        $allSales = $query->paginate(10);
 
         return view('sales.all', compact('allSales'));
     }
