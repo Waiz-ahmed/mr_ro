@@ -19,6 +19,10 @@ class DailySale extends Model
         'shop_id',
     ];
 
+    protected $casts = [
+        'sale_date' => 'datetime',
+    ];
+
     // DailySale Model
     public function shop()
     {
