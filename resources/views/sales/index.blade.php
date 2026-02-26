@@ -233,10 +233,10 @@
                     <span>Discount:</span>
                     <span>$<span id="discount">0.00</span></span>
                 </div>
-                <div class="summary-row">
+                <!-- <div class="summary-row">
                     <span>VAT (10%):</span>
                     <span>$<span id="vat">0.00</span></span>
-                </div>
+                </div> -->
                 <hr class="my-1">
                 <div class="summary-row fw-bold">
                     <span>Total:</span>
@@ -268,8 +268,8 @@
 
                         <!-- Discount Section (shown when customer selected) -->
                         <div id="discount-section" style="display: none;" class="discount-section mt-2">
-                            <label for="discountInput" class="form-label small mb-1">Discount per Bottle</label>
-                            <input type="number" id="discountInput" name="discount_per_bottle" class="form-control form-control-sm-custom" min="0" value="0">
+                            <label for="discountInput" class="form-label small mb-1">Discount Amount</label>
+                            <input type="number" id="discountInput" name="discount" class="form-control form-control-sm-custom" min="0" value="0">
                         </div>
 
                         <!-- Hidden Inputs -->
@@ -419,15 +419,15 @@
                 </tr>`;
         });
 
-        const discountPerBottle = parseFloat(document.getElementById('discountInput')?.value) || 0;
+        const discount = parseFloat(document.getElementById('discountInput')?.value) || 0;
         const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-        const discount = discountPerBottle * totalQty;
-        const vat = (subtotal - discount) * 0.10;
-        const total = subtotal - discount + vat;
+
+        // Remove VAT calculation
+        const total = subtotal - discount;
 
         document.getElementById('subtotal').textContent = subtotal.toFixed(2);
         document.getElementById('discount').textContent = discount.toFixed(2);
-        document.getElementById('vat').textContent = vat.toFixed(2);
+
         document.getElementById('total').textContent = total.toFixed(2);
         document.getElementById('total-display').textContent = total.toFixed(2);
 

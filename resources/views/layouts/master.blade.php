@@ -148,8 +148,11 @@
         @yield('content')
     </div>
 
-    <footer class="text-center text-muted py-3 bg-light border-top">
-        &copy; {{ date('Y') }} POS System
+    <footer class="text-center text-muted py-2 bg-light border-top">
+        &copy; {{ date('Y') }} POS System | Powered by 
+        <a href="https://codecousins.com/" target="_blank" class="text-decoration-none">
+            CodeCousins
+        </a>
     </footer>
 
     <!-- Bootstrap Bundle JS -->
