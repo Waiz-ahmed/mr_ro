@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -48,5 +49,53 @@ class User extends Authenticatable
     public function shops()
     {
         return $this->hasMany(Shop::class);
+    }
+
+    // Add to app/Models/User.php
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'role_user');
+    }
+
+    public function hasRole($roleSlug)
+    {
+        return $this->roles()->where('slug', $roleSlug)->exists();
+    }
+
+    public function hasPermission($permissionSlug)
+    {
+        // Super admin has all permissions
+        if ($this->hasRole('super-admin')) {
+            return true;
+        }
+        
+        foreach ($this->roles as $role) {
+            if ($role->hasPermission($permissionSlug)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    public function canAccessMenu($menuRoute)
+    {
+        // Super admin has access to all menus
+        if ($this->hasRole('super-admin')) {
+            return true;
+        }
+        
+        // Check if user has any permission that grants access to this menu
+        $permissions = Permission::whereHas('menu', function($query) use ($menuRoute) {
+            $query->where('route', $menuRoute);
+        })->where('type', 'menu')->get();
+        
+        foreach ($permissions as $permission) {
+            if ($this->hasPermission($permission->slug)) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }
