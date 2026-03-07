@@ -297,7 +297,7 @@
         </p>
 
         <p>
-            Powered by CodeCosuins
+            Powered by <a href="https://codecousins.com/" target="_blank">CodeCosuins</a>
         </p>
 
     </div>

@@ -133,7 +133,7 @@
                             <i class="fa fa-chart-bar"></i> Reports
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ route('sales.report', ['type' => 'daily']) }}">All Daily Sales</a></li>
+                            <li><a class="dropdown-item" href="{{ route('sales.report', ['type' => 'daily']) }}">Daily Sales</a></li>
                             <li><a class="dropdown-item" href="{{ route('sales.report', ['type' => 'credit']) }}">Credit Sales Only</a></li>
                             <li><a class="dropdown-item" href="{{ route('sales.report', ['type' => 'non-credit']) }}">Non-Credit Sales</a></li>
                         </ul>
