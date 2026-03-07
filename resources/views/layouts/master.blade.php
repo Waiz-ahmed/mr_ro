@@ -151,7 +151,7 @@
                             @permission('manage-shops')
                             <li>
                                 <a class="dropdown-item" href="{{ route('shops.settings') }}">
-                                    <i class="fa fa-store"></i> My Shops
+                                    <i class="fa fa-store"></i> Shops
                                 </a>
                             </li>
                             @endpermission
