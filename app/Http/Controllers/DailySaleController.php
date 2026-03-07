@@ -196,18 +196,35 @@ class DailySaleController extends Controller
         //
     }
 
-    public function report($type)
+    public function report()
     {
-        if ($type == 'credit') {
-            $sales = DailySale::where('is_credit', 1)->get();
-        } elseif ($type == 'non-credit') {
-            $sales = DailySale::where('is_credit', 0)->get();
-        } else {
-            $sales = DailySale::all();
-        }
+        $today = Carbon::today();
 
-        $pdf = PDF::loadView('sales.report', compact('sales', 'type'));
-        return $pdf->download("{$type}_sales_report.pdf");
+        // Cash Sales
+        $cashSales = DailySale::with('customer')
+            ->whereDate('sale_date', $today)
+            ->where('is_credit', 0)
+            ->get();
+
+        // Credit Sales
+        $creditSales = DailySale::with('customer')
+            ->whereDate('sale_date', $today)
+            ->where('is_credit', 1)
+            ->get();
+
+        // Payments received today
+        $payments = \App\Models\Payment::with('customer')
+            ->whereDate('payment_date', $today)
+            ->get();
+
+        $pdf = Pdf::loadView('sales.report', [
+            'cashSales' => $cashSales,
+            'creditSales' => $creditSales,
+            'payments' => $payments,
+            'date' => $today->format('Y-m-d')
+        ]);
+
+        return $pdf->download('daily_sales_report_'.$today->format('Y_m_d').'.pdf');
     }
 
     public function shopPosPage($shopId)
