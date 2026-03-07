@@ -7,32 +7,92 @@
 
     <style>
         body {
-            font-family: Arial;
+            font-family: DejaVu Sans, sans-serif;
             font-size: 12px;
+            color: #333;
+        }
+
+        .header {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 120px;
+        }
+
+        .title {
+            text-align: right;
+        }
+
+        .title h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .title p {
+            margin: 2px 0;
+        }
+
+        .section {
+            margin-top: 25px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #444;
+            padding-bottom: 4px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 25px;
-        }
-
-        th,
-        td {
-            border: 1px solid #ccc;
-            padding: 6px;
+            margin-top: 8px;
         }
 
         th {
-            background: #f2f2f2;
+            background: #2f4050;
+            color: white;
+            padding: 7px;
+            text-align: left;
+            font-size: 12px;
         }
 
-        h2 {
-            margin-bottom: 5px;
+        td {
+            border: 1px solid #ddd;
+            padding: 6px;
         }
 
-        .section {
-            margin-top: 20px;
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .total {
+            text-align: right;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        .summary {
+            margin-top: 25px;
+            border: 1px solid #ccc;
+        }
+
+        .summary td {
+            padding: 8px;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 10px;
+            border-top: 1px solid #ccc;
+            padding-top: 5px;
         }
     </style>
 
@@ -40,14 +100,28 @@
 
 <body>
 
-    <h1>Daily Sales Report</h1>
-    <p>Date: {{ $date }}</p>
+    <!-- HEADER -->
 
+    <!-- HEADER -->
+    <table style="width: 100%; margin-bottom: 20px;">
+        <tr>
+            <td style="width: 120px; border: none;">
+                <img src="{{ public_path('images/logo.png') }}" style="width: 120px;">
+            </td>
+            <td style="text-align: right; border: none;">
+                <h1 style="margin: 0; font-size: 22px;">Daily Sales Report</h1>
+                <p style="margin: 2px 0;">Date: {{ $date }}</p>
+            </td>
+        </tr>
+    </table>
     <!-- CASH SALES -->
+
     <div class="section">
-        <h2>Cash Sales</h2>
+
+        <div class="section-title">Cash Sales</div>
 
         <table>
+
             <thead>
                 <tr>
                     <th>#</th>
@@ -79,18 +153,22 @@
                 @endforeach
 
             </tbody>
+
         </table>
 
-        <b>Total Cash Sales: {{ number_format($cashTotal,2) }}</b>
+        <div class="total">
+            Total Cash Sales: {{ number_format($cashTotal,2) }}
+        </div>
 
     </div>
+
 
 
     <!-- CREDIT SALES -->
 
     <div class="section">
 
-        <h2>Credit Sales</h2>
+        <div class="section-title">Credit Sales</div>
 
         <table>
 
@@ -126,16 +204,19 @@
 
         </table>
 
-        <b>Total Credit Sales: {{ number_format($creditTotal,2) }}</b>
+        <div class="total">
+            Total Credit Sales: {{ number_format($creditTotal,2) }}
+        </div>
 
     </div>
 
 
-    <!-- PAYMENTS RECEIVED -->
+
+    <!-- PAYMENTS -->
 
     <div class="section">
 
-        <h2>Credit Payments Received</h2>
+        <div class="section-title">Credit Payments Received</div>
 
         <table>
 
@@ -171,7 +252,53 @@
 
         </table>
 
-        <b>Total Payments Received: {{ number_format($paymentTotal,2) }}</b>
+        <div class="total">
+            Total Payments Received: {{ number_format($paymentTotal,2) }}
+        </div>
+
+    </div>
+
+
+
+    <!-- SUMMARY -->
+
+    <table class="summary">
+
+        <tr>
+            <td><strong>Total Cash Sales</strong></td>
+            <td>{{ number_format($cashTotal,2) }}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Total Credit Sales</strong></td>
+            <td>{{ number_format($creditTotal,2) }}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Total Payments Received</strong></td>
+            <td>{{ number_format($paymentTotal,2) }}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Total Business Generated Today</strong></td>
+            <td>{{ number_format($cashTotal + $creditTotal,2) }}</td>
+        </tr>
+
+    </table>
+
+
+
+    <!-- FOOTER -->
+
+    <div class="footer">
+
+        <p>
+            74B, block Pak Arab, Housing Block B Society, Lahore, 54840
+        </p>
+
+        <p>
+            Powered by CodeCosuins
+        </p>
 
     </div>
 
