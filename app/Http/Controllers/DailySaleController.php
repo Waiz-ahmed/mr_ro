@@ -196,23 +196,40 @@ class DailySaleController extends Controller
         //
     }
 
-    public function report()
+    public function report($type)
     {
         $today = Carbon::today();
 
-        // Cash Sales
+        if ($type === 'credit') {
+            $creditSales = DailySale::with('customer')
+                ->whereDate('sale_date', $today)
+                ->where('is_credit', 1)
+                ->get();
+
+            $payments = \App\Models\Payment::with('customer')
+                ->whereDate('payment_date', $today)
+                ->get();
+
+            $pdf = Pdf::loadView('sales.report.credit', [
+                'creditSales' => $creditSales,
+                'payments' => $payments,
+                'date' => $today->format('Y-m-d'),
+            ]);
+
+            return $pdf->download('credit_sales_report_' . $today->format('Y_m_d') . '.pdf');
+        }
+
+        // Default: Daily Sales (cash + credit)
         $cashSales = DailySale::with('customer')
             ->whereDate('sale_date', $today)
             ->where('is_credit', 0)
             ->get();
 
-        // Credit Sales
         $creditSales = DailySale::with('customer')
             ->whereDate('sale_date', $today)
             ->where('is_credit', 1)
             ->get();
 
-        // Payments received today
         $payments = \App\Models\Payment::with('customer')
             ->whereDate('payment_date', $today)
             ->get();
@@ -221,7 +238,7 @@ class DailySaleController extends Controller
             'cashSales' => $cashSales,
             'creditSales' => $creditSales,
             'payments' => $payments,
-            'date' => $today->format('Y-m-d')
+            'date' => $today->format('Y-m-d'),
         ]);
 
         return $pdf->download('daily_sales_report_'.$today->format('Y_m_d').'.pdf');
