@@ -1,7 +1,7 @@
 <div class="modal fade" id="assignRolesModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="" method="POST" id="assignRolesForm">
+            <form method="POST" id="assignRolesForm">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title">Assign Roles to User</h5>

@@ -50,7 +50,7 @@ Route::middleware('auth')->group(function () {
         
         // AJAX routes
         Route::get('/menus/{menu}/permissions', [App\Http\Controllers\Admin\PermissionController::class, 'getMenuPermissions'])->name('menus.permissions');
-        Route::get('/roles/{role}/permissions', [App\Http\Controllers\Admin\PermissionController::class, 'getRolePermissions'])->name('roles.permissions.get');
+        // Route::get('/roles/{role}/permissions', [App\Http\Controllers\Admin\PermissionController::class, 'getRolePermissions'])->name('roles.permissions.get');
         Route::post('/roles/{role}/permissions/sync', [App\Http\Controllers\Admin\PermissionController::class, 'syncRolePermissions'])->name('roles.permissions.sync');
         
         // Save all permissions from matrix

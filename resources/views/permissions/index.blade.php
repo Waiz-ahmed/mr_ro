@@ -24,33 +24,33 @@
                 <div class="card-body">
                     <ul class="nav nav-tabs" id="permissionTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="roles-tab" data-bs-toggle="tab" data-bs-target="#roles" type="button" role="tab">Roles</button>
+                            <button class="nav-link active" id="roles-tab" data-bs-toggle="tab" data-bs-target="#roles" type="button" role="tab" style="color: black !important;">Roles</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="permissions-tab" data-bs-toggle="tab" data-bs-target="#permissions" type="button" role="tab">Permissions</button>
+                            <button class="nav-link" id="permissions-tab" data-bs-toggle="tab" data-bs-target="#permissions" type="button" role="tab" style="color: black !important;">Permissions</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">Users</button>
+                            <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" style="color: black !important;">Users</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="matrix-tab" data-bs-toggle="tab" data-bs-target="#matrix" type="button" role="tab">Permission Matrix</button>
+                            <button class="nav-link" id="matrix-tab" data-bs-toggle="tab" data-bs-target="#matrix" type="button" role="tab" style="color: black !important;">Permission Matrix</button>
                         </li>
                     </ul>
-                    
+
                     <div class="tab-content p-3" id="permissionTabsContent">
                         <!-- Roles Tab -->
                         @include('permissions.tabs.roles')
-                        
+
                         <!-- Permissions Tab -->
                         @include('permissions.tabs.permissions')
-                        
+
                         <!-- Users Tab -->
                         @include('permissions.tabs.users')
-                        
+
                         <!-- Matrix Tab -->
                         @include('permissions.tabs.matrix')
 
-                        
+
                     </div>
                 </div>
             </div>
@@ -78,42 +78,71 @@
 <script>
     $(document).ready(function() {
         // Handle role selection for permission assignment
-        $('.assign-permissions-btn').click(function() {
-            var roleId = $(this).data('role-id');
-            var roleName = $(this).data('role-name');
-            $('#assignPermissionModal').find('.modal-title').text('Assign Permissions to ' + roleName);
+        $('.assign-permissions-btn').on('click', function() {
+
+            let roleId = $(this).data('role-id');
+            let roleName = $(this).data('role-name');
+
+            $('#assignPermissionModal .modal-title')
+                .text('Assign Permissions to ' + roleName);
+
             $('#assign_role_id').val(roleId);
-            
-            // Load permissions for this role
+
+            // SET FORM ACTION CORRECTLY
+            let actionUrl = '/admin/roles/' + roleId + '/permissions';
+
+            $('#assignPermissionForm').attr('action', actionUrl);
+
+            // Load current permissions
             $.get('/admin/roles/' + roleId + '/permissions', function(data) {
-                // Populate permissions checkboxes
-                // This will be implemented based on your UI
+
+                $('.permission-item').prop('checked', false);
+
+                if (data.permissions) {
+                    data.permissions.forEach(function(permissionId) {
+                        $('#perm_' + permissionId).prop('checked', true);
+                    });
+                }
+
             });
+
         });
-        
+
         // Check/uncheck all permissions in a module
-        $('.check-all').click(function() {
+        $('.check-all-module').click(function() {
             var module = $(this).data('module');
             $('.' + module + '-permission').prop('checked', $(this).prop('checked'));
         });
 
         // Handle user selection for role assignment
-        $('.assign-roles-btn').click(function() {
-            var userId = $(this).data('user-id');
-            var userName = $(this).data('user-name');
-            $('#assignRolesModal').find('.modal-title').text('Assign Roles to ' + userName);
+        $('.assign-roles-btn').on('click', function() {
+
+            let userId = $(this).data('user-id');
+            let userName = $(this).data('user-name');
+
+            $('#assignRolesModal .modal-title')
+                .text('Assign Roles to ' + userName);
+
             $('#assign_user_id').val(userId);
-            
-            // Load current roles for this user
+
+            // SET FORM ACTION
+            let actionUrl = '/admin/users/' + userId + '/roles';
+
+            $('#assignRolesForm').attr('action', actionUrl);
+
+            // Load user roles
             $.get('/admin/users/' + userId + '/roles', function(data) {
-                // Uncheck all first
+
                 $('.role-checkbox').prop('checked', false);
-                
-                // Check the ones that belong to this user
-                data.roles.forEach(function(roleId) {
-                    $('#role_' + roleId).prop('checked', true);
-                });
+
+                if (data.roles) {
+                    data.roles.forEach(function(roleId) {
+                        $('#role_' + roleId).prop('checked', true);
+                    });
+                }
+
             });
+
         });
     });
 </script>
