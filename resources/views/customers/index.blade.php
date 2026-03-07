@@ -57,15 +57,23 @@
                     <td>{{ $customer->address ?? '-' }}</td>
                     <td>{{ $customer->created_at ? $customer->created_at->format('Y-m-d') : '-' }}</td>
                     <td>
-                        <a href="{{ route('customers.edit', $customer) }}" class="btn btn-sm btn-warning">Edit</a>
+                        @if(can('edit-customer'))
+                        <a href="{{ route('customers.edit', $customer) }}" class="btn btn-sm btn-warning">
+                            Edit
+                        </a>
+                        @endif
 
+                        @if(can('delete-customer'))
                         <form action="{{ route('customers.destroy', $customer) }}" method="POST" class="d-inline">
-                            @csrf @method('DELETE')
+                            @csrf
+                            @method('DELETE')
+
                             <button type="submit" class="btn btn-sm btn-danger"
                                 onclick="return confirm('Are you sure to delete this customer?')">
                                 Delete
                             </button>
                         </form>
+                        @endif
                     </td>
                 </tr>
                 @empty
