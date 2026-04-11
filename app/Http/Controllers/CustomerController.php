@@ -23,6 +23,7 @@ class CustomerController extends Controller
      */
     public function create()
     {
+        // dd('Create method reached successfully!');
         return view('customers.create');
     }
 

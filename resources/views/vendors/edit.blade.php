@@ -1,30 +1,31 @@
 @extends('layouts.master')
 
-@section('title', 'Add Customer')
+@section('title', 'Edit Vendor')
 
 @section('content')
 <div class="container py-2">
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold" style="color: #212529;">Add New Customer</h4>
-        <a href="{{ route('customers.index') }}" class="btn" style="background-color: #6c757d; color: white; border: none; border-radius: 12px; padding: 0.5rem 1.5rem; font-weight: 500; transition: all 0.2s;">
+        <h4 class="fw-bold" style="color: #212529;">Edit Vendor</h4>
+        <a href="{{ route('vendors.index') }}" class="btn" style="background-color: #6c757d; color: white; border: none; border-radius: 12px; padding: 0.5rem 1.5rem; font-weight: 500; transition: all 0.2s;">
             <i class="bi bi-arrow-left me-1"></i>Back to List
         </a>
     </div>
 
-    <!-- Add Form Card -->
+    <!-- Edit Form Card -->
     <div class="card border-0 shadow-sm" style="background-color: white; border-radius: 16px; overflow: hidden;">
         <div class="card-body p-4">
-            <form method="POST" action="{{ route('customers.store') }}">
+            <form method="POST" action="{{ route('vendors.update', $vendor->id) }}">
                 @csrf
+                @method('PUT')
 
                 <div class="mb-4">
-                    <label class="form-label text-muted small fw-semibold mb-2">Customer Name <span class="text-danger">*</span></label>
+                    <label class="form-label text-muted small fw-semibold mb-2">Vendor Name <span class="text-danger">*</span></label>
                     <div class="input-group">
                         <span class="input-group-text bg-light border-0" style="border-radius: 12px 0 0 12px;">
-                            <i class="bi bi-person" style="color: #0d6efd;"></i>
+                            <i class="bi bi-building" style="color: #0d6efd;"></i>
                         </span>
-                        <input type="text" name="name" class="form-control border-0 bg-light" value="{{ old('name') }}" required style="padding: 0.75rem 1rem; border-radius: 0 12px 12px 0;" placeholder="Enter customer name">
+                        <input type="text" name="name" class="form-control border-0 bg-light" value="{{ old('name', $vendor->name) }}" required style="padding: 0.75rem 1rem; border-radius: 0 12px 12px 0;" placeholder="Enter vendor name">
                     </div>
                     @error('name')
                         <small class="text-danger mt-1 d-block">{{ $message }}</small>
@@ -37,7 +38,7 @@
                         <span class="input-group-text bg-light border-0" style="border-radius: 12px 0 0 12px;">
                             <i class="bi bi-telephone" style="color: #0d6efd;"></i>
                         </span>
-                        <input type="text" name="phone" class="form-control border-0 bg-light" value="{{ old('phone') }}" style="padding: 0.75rem 1rem; border-radius: 0 12px 12px 0;" placeholder="Enter phone number">
+                        <input type="text" name="phone" class="form-control border-0 bg-light" value="{{ old('phone', $vendor->phone) }}" style="padding: 0.75rem 1rem; border-radius: 0 12px 12px 0;" placeholder="Enter phone number">
                     </div>
                     @error('phone')
                         <small class="text-danger mt-1 d-block">{{ $message }}</small>
@@ -50,7 +51,7 @@
                         <span class="input-group-text bg-light border-0" style="border-radius: 12px 0 0 12px;">
                             <i class="bi bi-geo-alt" style="color: #0d6efd;"></i>
                         </span>
-                        <textarea name="address" class="form-control border-0 bg-light" rows="3" style="padding: 0.75rem 1rem; border-radius: 0 12px 12px 0;" placeholder="Enter address">{{ old('address') }}</textarea>
+                        <textarea name="address" class="form-control border-0 bg-light" rows="3" style="padding: 0.75rem 1rem; border-radius: 0 12px 12px 0;" placeholder="Enter address">{{ old('address', $vendor->address) }}</textarea>
                     </div>
                     @error('address')
                         <small class="text-danger mt-1 d-block">{{ $message }}</small>
@@ -59,9 +60,9 @@
 
                 <div class="d-flex gap-3 mt-4">
                     <button type="submit" class="btn" style="background-color: #0d6efd; color: white; border: none; border-radius: 12px; padding: 0.75rem 2rem; font-weight: 500; transition: all 0.2s;">
-                        <i class="bi bi-save me-1"></i>Save Customer
+                        <i class="bi bi-check-circle me-1"></i>Update Vendor
                     </button>
-                    <a href="{{ route('customers.index') }}" class="btn" style="background-color: #6c757d; color: white; border: none; border-radius: 12px; padding: 0.75rem 2rem; font-weight: 500; transition: all 0.2s;">
+                    <a href="{{ route('vendors.index') }}" class="btn" style="background-color: #6c757d; color: white; border: none; border-radius: 12px; padding: 0.75rem 2rem; font-weight: 500; transition: all 0.2s;">
                         <i class="bi bi-x-circle me-1"></i>Cancel
                     </a>
                 </div>
@@ -71,64 +72,33 @@
 </div>
 
 <style>
-    /* Custom hover effects */
     .btn:hover {
         transform: translateY(-1px);
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
-    
-    .btn-primary:hover {
-        background-color: #0b5ed7 !important;
-        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
-    }
-    
-    .btn-secondary:hover {
-        background-color: #5a6268 !important;
-        box-shadow: 0 4px 10px rgba(108, 117, 125, 0.2);
-    }
-    
-    /* Card hover effect */
     .card {
         transition: transform 0.2s, box-shadow 0.2s;
     }
-    
     .card:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important;
     }
-    
-    /* Input group styling */
     .input-group:focus-within {
         box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
         border-radius: 12px;
     }
-    
     .input-group .form-control:focus {
         box-shadow: none;
         background-color: #f8f9fa !important;
     }
-    
-    /* Form label styling */
     .form-label {
         font-weight: 600;
         letter-spacing: 0.3px;
     }
-    
-    /* Textarea styling */
     textarea.form-control {
         resize: vertical;
         min-height: 100px;
     }
-    
-    /* Required field indicator */
-    .text-danger {
-        font-size: 0.875rem;
-    }
 </style>
-
-{{-- <!-- Add Bootstrap Icons if not already included in master layout -->
-@push('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-@endpush --}}
 
 @endsection

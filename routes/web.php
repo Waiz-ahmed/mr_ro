@@ -67,16 +67,16 @@ Route::middleware('auth')->group(function () {
     // POS Modules with Permissions
     // ========================
     
-    // Customers Module
-    Route::middleware(['permission:view-customers'])->group(function () {
-        Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
-        Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
-    });
-    
     Route::middleware(['permission:create-customer'])->group(function () {
         Route::get('/customers/create', [CustomerController::class, 'create'])->name('customers.create');
         Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
         Route::post('/customers/import', [CustomerController::class, 'import'])->name('customers.import');
+    });
+
+    // Customers Module
+    Route::middleware(['permission:view-customers'])->group(function () {
+        Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
+        Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
     });
     
     Route::middleware(['permission:edit-customer'])->group(function () {
@@ -141,12 +141,6 @@ Route::middleware('auth')->group(function () {
         Route::put('/payments/{payment}', [PaymentController::class, 'update'])->name('payments.update');
         Route::delete('/payments/{payment}', [PaymentController::class, 'destroy'])->name('payments.destroy');
     });
-
-    // Vendors Module (Admin only typically)
-    Route::middleware(['permission:view-vendors'])->group(function () {
-        Route::get('/vendors', [VendorController::class, 'index'])->name('vendors.index');
-        Route::get('/vendors/{vendor}', [VendorController::class, 'show'])->name('vendors.show');
-    });
     
     Route::middleware(['permission:manage-vendors'])->group(function () {
         Route::get('/vendors/create', [VendorController::class, 'create'])->name('vendors.create');
@@ -154,6 +148,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/vendors/{vendor}/edit', [VendorController::class, 'edit'])->name('vendors.edit');
         Route::put('/vendors/{vendor}', [VendorController::class, 'update'])->name('vendors.update');
         Route::delete('/vendors/{vendor}', [VendorController::class, 'destroy'])->name('vendors.destroy');
+        Route::post('/vendors/import', [VendorController::class, 'import'])->name('vendors.import');
+    });
+
+    // Vendors Module (Admin only typically)
+    Route::middleware(['permission:view-vendors'])->group(function () {
+        Route::get('/vendors', [VendorController::class, 'index'])->name('vendors.index');
+        Route::get('/vendors/{vendor}', [VendorController::class, 'show'])->name('vendors.show');
     });
 
     // Expenses Module
