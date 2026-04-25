@@ -19,5 +19,10 @@ class Customer extends Model
         return $this->hasMany(\App\Models\CreditCustomer::class);
     }
 
+    public function dailySales()
+    {
+        return $this->hasMany(DailySale::class);
+    }
+
 }
 

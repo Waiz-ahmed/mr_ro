@@ -6,270 +6,706 @@
     <title>@yield('title', 'POS System')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css" />
     @stack('styles')
 
     <style>
-        html,
-        body {
+        html, body {
             height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
         }
 
-        body {
+        /* ── Layout shell ── */
+        .app-shell {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ── Sidebar ── */
+        #sidebar {
+            width: 240px;
+            min-width: 240px;
+            background: #0d6efd;
             display: flex;
             flex-direction: column;
-        }
-
-        .main-content {
-            flex: 1 0 auto;
-        }
-
-        footer {
+            transition: width 0.25s ease, min-width 0.25s ease;
+            z-index: 1040;
             flex-shrink: 0;
         }
 
-        .nav-link {
-            color: #fff !important;
-            font-weight: 400 !important;
+        #sidebar.collapsed {
+            width: 56px;
+            min-width: 56px;
         }
 
-        .navbar-brand {
-            font-weight: bold !important;
+        /* Sidebar header */
+        .sb-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            white-space: nowrap;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .sb-brand {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            opacity: 1;
+            transition: opacity 0.2s;
+            overflow: hidden;
+        }
+
+        #sidebar.collapsed .sb-brand {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Toggle button */
+        #sb-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #fff;
+            font-size: 18px;
+            transition: background 0.15s;
+        }
+
+        #sb-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        #sb-toggle i {
+            transition: transform 0.25s;
+        }
+
+        #sidebar.collapsed #sb-toggle i {
+            transform: rotate(180deg);
+        }
+
+        /* Nav scroll area */
+        .sb-nav {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 8px 0;
+        }
+
+        .sb-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sb-nav {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        /* Section headers */
+        .sb-section {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255, 255, 255, 0.45);
+            padding: 14px 16px 4px;
+            white-space: nowrap;
+            transition: opacity 0.2s;
+        }
+
+        #sidebar.collapsed .sb-section {
+            opacity: 0;
+            display: none !important;
+        }
+
+        /* Nav items */
+        .sb-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 13.5px;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: background 0.15s, color 0.15s;
+            position: relative;
+        }
+
+        .sb-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .sb-item.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+
+        .sb-item i {
+            font-size: 15px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sb-label {
+            opacity: 1;
+            transition: opacity 0.2s;
+            overflow: hidden;
+        }
+
+        #sidebar.collapsed .sb-label {
+            opacity: 0;
+        }
+
+        /* User dropdown — always pops right so it's never clipped by sidebar */
+        .sb-footer .dropdown-menu {
+            position: fixed !important;
+            bottom: 60px;
+            left: auto;
+            top: auto;
+            min-width: 180px;
+            z-index: 2000;
+        }
+
+        .sb-footer .dropdown-menu.show {
+            display: block;
+        }
+        #sidebar.collapsed .sb-item::after {
+            content: attr(data-label);
+            position: absolute;
+            left: 56px;
+            background: #1a1a2e;
+            color: #fff;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s;
+            z-index: 2000;
+        }
+
+        #sidebar.collapsed .sb-item:hover::after {
+            opacity: 1;
+        }
+
+        /* Dropdown caret */
+        .sb-caret {
+            margin-left: auto;
+            font-size: 11px;
+            opacity: 0.6;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        #sidebar.collapsed .sb-caret {
+            opacity: 0;
+        }
+
+        .sb-item[aria-expanded="true"] .sb-caret {
+            transform: rotate(90deg);
+        }
+
+        /* Sub-menu */
+        .sb-submenu {
+            background: rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+
+        .sb-submenu .sb-item {
+            padding-left: 44px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        #sidebar.collapsed .sb-submenu {
+            display: none;
+        }
+
+        /* User footer */
+        .sb-footer {
+            padding: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .sb-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            padding: 4px 6px;
+            transition: background 0.15s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .sb-user:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sb-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .sb-user-info {
+            opacity: 1;
+            transition: opacity 0.2s;
+            overflow: hidden;
+        }
+
+        #sidebar.collapsed .sb-user-info {
+            opacity: 0;
+        }
+
+        .sb-user-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .sb-user-role {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        /* ── Main area ── */
+        .app-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        /* Top bar */
+        .app-topbar {
+            height: 54px;
+            background: #fff;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .app-topbar .page-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #212529;
+            margin: 0;
+        }
+
+        /* Page content */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        /* Flash messages */
+        .flash-stack {
+            margin-bottom: 20px;
+        }
+
+        /* Mobile overlay */
+        #sb-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 1039;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                transform: translateX(-100%);
+                width: 240px !important;
+                min-width: 240px !important;
+                transition: transform 0.25s ease;
+            }
+
+            #sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            #sidebar.collapsed {
+                transform: translateX(-100%);
+            }
+
+            #sb-overlay.active {
+                display: block;
+            }
+
+            /* Show the mobile toggle in topbar */
+            #mobile-toggle {
+                display: flex !important;
+            }
+        }
+
+        #mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #495057;
+            cursor: pointer;
+            padding: 4px 8px;
         }
     </style>
 </head>
 
 <body>
+<div class="app-shell">
 
-    {{-- Navbar for authenticated users --}}
+    {{-- ── Sidebar ── --}}
     @auth
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url('/') }}">
-                <!-- <img src="{{ asset('images/mr_ro_logo.jpg') }}" alt="Logo" style="height: 50px; width: auto; vertical-align: middle;"> -->
-                <span style="margin-left: 8px;">POS System</span>
+    <nav id="sidebar">
+
+        {{-- Header --}}
+        <div class="sb-header">
+            <button id="sb-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
+                <i class="fa fa-chevron-left"></i>
+            </button>
+            <span class="sb-brand">POS System</span>
+        </div>
+
+        {{-- Nav items --}}
+        <div class="sb-nav">
+
+            {{-- Main --}}
+            <div class="sb-section">Main</div>
+
+            <a class="sb-item {{ request()->is('dashboard') ? 'active' : '' }}"
+               href="/dashboard"
+               data-label="Dashboard">
+                <i class="fa fa-th-large"></i>
+                <span class="sb-label">Dashboard</span>
             </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            @permission('view-customers')
+            <a class="sb-item {{ request()->routeIs('customers.*') ? 'active' : '' }}"
+               href="{{ route('customers.index') }}"
+               data-label="Customers">
+                <i class="fa fa-users"></i>
+                <span class="sb-label">Customers</span>
+            </a>
+            @endpermission
 
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    {{-- Menu items based on permissions --}}
-                    
-                    {{-- Customers - Visible to admin, staff, or users with permission --}}
-                    @permission('view-customers')
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('customers.index') }}">
-                            <i class="fa fa-users"></i> Customers
-                        </a>
-                    </li>
-                    @endpermission
+            @permission('view-credits')
+            <a class="sb-item {{ request()->routeIs('credits.*') ? 'active' : '' }}"
+               href="{{ route('credits.index') }}"
+               data-label="Credit Customers">
+                <i class="fa fa-credit-card"></i>
+                <span class="sb-label">Credit Customers</span>
+            </a>
+            @endpermission
 
-                    {{-- Credit Customers - Visible to admin, staff, or users with permission --}}
-                    @permission('view-credits')
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('credits.index') }}">
-                            <i class="fa fa-credit-card"></i> Credit Customers
-                        </a>
-                    </li>
-                    @endpermission
+            @permission('view-payments')
+            <a class="sb-item {{ request()->routeIs('payments.*') ? 'active' : '' }}"
+               href="{{ route('payments.index') }}"
+               data-label="Payments">
+                <i class="fa fa-money-bill"></i>
+                <span class="sb-label">Payments</span>
+            </a>
+            @endpermission
 
-                    {{-- Payments - Visible to admin, staff, or users with permission --}}
-                    @permission('view-payments')
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('payments.index') }}">
-                            <i class="fa fa-money-bill"></i> Payments
-                        </a>
-                    </li>
-                    @endpermission
+            @permission('view-orders')
+            <a class="sb-item {{ request()->routeIs('sales.*') ? 'active' : '' }}"
+               href="{{ route('sales.index') }}"
+               data-label="All Orders">
+                <i class="fa fa-shopping-cart"></i>
+                <span class="sb-label">All Orders</span>
+            </a>
+            @endpermission
 
-                    {{-- Shops - Visible to admin, staff, or users with permission --}}
-                    @permission('view-shops')
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('shops.cards') }}">
-                            <i class="fa fa-store"></i> Shops
-                        </a>
-                    </li>
-                    @endpermission
+            @permission('view-shops')
+            <a class="sb-item {{ request()->routeIs('shops.*') ? 'active' : '' }}"
+               href="{{ route('shops.cards') }}"
+               data-label="Shops">
+                <i class="fa fa-store"></i>
+                <span class="sb-label">Shops</span>
+            </a>
+            @endpermission
 
-                    {{-- All Orders - Visible to admin, staff, or users with permission --}}
-                    @permission('view-orders')
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('sales.index') }}">
-                            <i class="fa fa-shopping-cart"></i> All Orders
-                        </a>
-                    </li>
-                    @endpermission
+            {{-- Operations --}}
+            <div class="sb-section">Operations</div>
 
-                    {{-- Vendors - Visible only to admin or users with permission --}}
-                    @permission('view-vendors')
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('vendors.index') }}">
-                            <i class="fa fa-truck"></i> Vendors
-                        </a>
-                    </li>
-                    @endpermission
+            @permission('view-vendors')
+            <a class="sb-item {{ request()->routeIs('vendors.*') ? 'active' : '' }}"
+               href="{{ route('vendors.index') }}"
+               data-label="Vendors">
+                <i class="fa fa-truck"></i>
+                <span class="sb-label">Vendors</span>
+            </a>
+            @endpermission
 
-                    {{-- Expenses - Visible only to admin or users with permission --}}
-                    @permission('view-expenses')
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('expenses.index') }}">
-                            <i class="fa fa-chart-line"></i> Expenses
-                        </a>
-                    </li>
-                    @endpermission
+            @permission('view-expenses')
+            <a class="sb-item {{ request()->routeIs('expenses.*') ? 'active' : '' }}"
+               href="{{ route('expenses.index') }}"
+               data-label="Expenses">
+                <i class="fa fa-chart-line"></i>
+                <span class="sb-label">Expenses</span>
+            </a>
+            @endpermission
 
-                    {{-- Reports Dropdown - Visible to admin or users with view-reports permission --}}
-                    @permission('view-reports')
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fa fa-chart-bar"></i> Reports
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ route('sales.report', ['type' => 'daily']) }}">Daily Sales</a></li>
-                            <li><a class="dropdown-item" href="{{ route('sales.report', ['type' => 'credit']) }}">Credit Sales Only</a></li>
-                            <li><a class="dropdown-item" href="{{ route('sales.report', ['type' => 'non-credit']) }}">Non-Credit Sales</a></li>
-                        </ul>
-                    </li>
-                    @endpermission
+            {{-- Reports --}}
+            @permission('view-reports')
+            <div class="sb-section">Reports</div>
 
-                    {{-- Settings Dropdown - Visible to users with any settings permission --}}
-                    @anypermission('view-settings|manage-settings|manage-permissions|manage-shops')
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fa fa-cog"></i> Settings
-                        </a>
-                        <ul class="dropdown-menu">
-                            {{-- My Shops - Visible to users with manage-shops permission --}}
-                            @permission('manage-shops')
-                            <li>
-                                <a class="dropdown-item" href="{{ route('shops.settings') }}">
-                                    <i class="fa fa-store"></i> Shops
-                                </a>
-                            </li>
-                            @endpermission
+            <a class="sb-item {{ request()->is('*report*daily*') ? 'active' : '' }}"
+               href="{{ route('sales.report', ['type' => 'daily']) }}"
+               data-label="Daily Sales">
+                <i class="fa fa-chart-bar"></i>
+                <span class="sb-label">Daily Sales</span>
+            </a>
 
-                            {{-- Taxes - Placeholder for future --}}
-                            @permission('manage-taxes')
-                            <li><a class="dropdown-item" href="#"><i class="fa fa-percent"></i> Taxes</a></li>
-                            @endpermission
+            <a class="sb-item {{ request()->is('*report*credit*') ? 'active' : '' }}"
+               href="{{ route('sales.report', ['type' => 'credit']) }}"
+               data-label="Credit Sales">
+                <i class="fa fa-file-invoice-dollar"></i>
+                <span class="sb-label">Credit Sales</span>
+            </a>
 
-                            {{-- Printers - Placeholder for future --}}
-                            @permission('manage-printers')
-                            <li><a class="dropdown-item" href="#"><i class="fa fa-print"></i> Printers</a></li>
-                            @endpermission
+            <a class="sb-item {{ request()->is('*report*non-credit*') ? 'active' : '' }}"
+               href="{{ route('sales.report', ['type' => 'non-credit']) }}"
+               data-label="Non-Credit Sales">
+                <i class="fa fa-file-alt"></i>
+                <span class="sb-label">Non-Credit Sales</span>
+            </a>
+            @endpermission
 
-                            {{-- Permissions - Visible to users with manage-permissions permission --}}
-                            @permission('manage-permissions')
-                            <li>
-                                <a class="dropdown-item" href="{{ route('admin.permissions.index') }}">
-                                    <i class="fa fa-shield-alt"></i> Permissions
-                                </a>
-                            </li>
-                            @endpermission
+            {{-- Settings --}}
+            @anypermission('view-settings|manage-settings|manage-permissions|manage-shops')
+            <div class="sb-section">Settings</div>
 
-                            {{-- General Settings - Visible to users with manage-settings permission --}}
-                            @permission('manage-settings')
-                            <li>
-                                <a class="dropdown-item" href="{{ route('settings.general') }}">
-                                    <i class="fa fa-sliders-h"></i> General Settings
-                                </a>
-                            </li>
-                            @endpermission
-                        </ul>
-                    </li>
-                    @endanypermission
+            @permission('manage-shops')
+            <a class="sb-item {{ request()->routeIs('shops.settings') ? 'active' : '' }}"
+               href="{{ route('shops.settings') }}"
+               data-label="Shops">
+                <i class="fa fa-store"></i>
+                <span class="sb-label">Shops</span>
+            </a>
+            @endpermission
 
-                    {{-- Fallback for admin/staff using old role system (temporary) --}}
-                    @if (in_array(Auth::user()->role, ['admin', 'staff']) && !auth()->user()->hasPermission('view-customers'))
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('customers.index') }}">Customers (Legacy)</a>
-                    </li>
-                    @endif
-                </ul>
+            @permission('manage-taxes')
+            <a class="sb-item" href="#" data-label="Taxes">
+                <i class="fa fa-percent"></i>
+                <span class="sb-label">Taxes</span>
+            </a>
+            @endpermission
 
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-light d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fa-solid fa-user-circle fa-lg me-2"></i>
-                            {{ Auth::user()->name }}
+            @permission('manage-printers')
+            <a class="sb-item" href="#" data-label="Printers">
+                <i class="fa fa-print"></i>
+                <span class="sb-label">Printers</span>
+            </a>
+            @endpermission
+
+            @permission('manage-permissions')
+            <a class="sb-item {{ request()->routeIs('admin.permissions.*') ? 'active' : '' }}"
+               href="{{ route('admin.permissions.index') }}"
+               data-label="Permissions">
+                <i class="fa fa-shield-alt"></i>
+                <span class="sb-label">Permissions</span>
+            </a>
+            @endpermission
+
+            @permission('manage-settings')
+            <a class="sb-item {{ request()->routeIs('settings.*') ? 'active' : '' }}"
+               href="{{ route('settings.general') }}"
+               data-label="General Settings">
+                <i class="fa fa-sliders-h"></i>
+                <span class="sb-label">General Settings</span>
+            </a>
+            @endpermission
+
+            @endanypermission
+
+            {{-- Legacy fallback --}}
+            @if(in_array(Auth::user()->role, ['admin','staff']) && !auth()->user()->hasPermission('view-customers'))
+            <a class="sb-item" href="{{ route('customers.index') }}" data-label="Customers">
+                <i class="fa fa-users"></i>
+                <span class="sb-label">Customers (Legacy)</span>
+            </a>
+            @endif
+
+        </div>
+
+        {{-- User footer --}}
+        <div class="sb-footer">
+            <div class="dropdown">
+                <a class="sb-user" href="#" data-bs-toggle="dropdown">
+                    <div class="sb-avatar">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                    </div>
+                    <div class="sb-user-info">
+                        <div class="sb-user-name">{{ Auth::user()->name }}</div>
+                        <div class="sb-user-role">
                             @role('admin')
-                                <span class="badge bg-warning text-dark ms-2">Admin</span>
+                                Admin
                             @else
-                                <span class="badge bg-info ms-2">{{ Auth::user()->role }}</span>
+                                {{ ucfirst(Auth::user()->role) }}
                             @endrole
+                        </div>
+                    </div>
+                </a>
+                <ul class="dropdown-menu mb-1">
+                    <li>
+                        <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                            <i class="fa fa-user me-2"></i> Profile
                         </a>
-
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                                    <i class="fa fa-user"></i> Profile
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button class="dropdown-item" type="submit">
-                                        <i class="fa fa-sign-out-alt"></i> Logout
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button class="dropdown-item text-danger" type="submit">
+                                <i class="fa fa-sign-out-alt me-2"></i> Logout
+                            </button>
+                        </form>
                     </li>
                 </ul>
             </div>
         </div>
+
     </nav>
+
+    {{-- Mobile overlay --}}
+    <div id="sb-overlay" onclick="closeMobileSidebar()"></div>
     @endauth
 
-    {{-- Page content --}}
-    <div class="main-content container-fluid py-4">
-        {{-- Session flash messages --}}
-        @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        @endif
+    {{-- ── Main area ── --}}
+    <div class="app-main">
 
-        @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        @endif
+        {{-- Top bar --}}
+        @auth
+        <div class="app-topbar d-none">
+            {{-- Mobile toggle --}}
+            <button id="mobile-toggle" onclick="openMobileSidebar()">
+                <i class="fa fa-bars"></i>
+            </button>
 
-        @if (session('warning'))
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            {{ session('warning') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        @endif
+            <span class="page-title">@yield('page-title', 'Dashboard')</span>
 
-        {{-- Blade section content --}}
-        @yield('content')
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <span class="text-muted" style="font-size:13px">{{ now()->format('d M Y') }}</span>
+            </div>
+        </div>
+        @endauth
+
+        {{-- Page content --}}
+        <div class="app-content">
+
+            {{-- Flash messages --}}
+            <div class="flash-stack">
+                @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show mb-2" role="alert">
+                    <i class="fa fa-check-circle me-2"></i>{{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                @endif
+
+                @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show mb-2" role="alert">
+                    <i class="fa fa-exclamation-circle me-2"></i>{{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                @endif
+
+                @if(session('warning'))
+                <div class="alert alert-warning alert-dismissible fade show mb-2" role="alert">
+                    <i class="fa fa-exclamation-triangle me-2"></i>{{ session('warning') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                @endif
+            </div>
+
+            @yield('content')
+        </div>
+
+        <footer class="text-center text-muted py-2 bg-light border-top" style="font-size:12px;flex-shrink:0">
+            &copy; {{ date('Y') }} POS System | Powered by
+            <a href="https://codecousins.com/" target="_blank" class="text-decoration-none">CodeCousins</a>
+        </footer>
+
     </div>
+</div>
 
-    <footer class="text-center text-muted py-2 bg-light border-top">
-        &copy; {{ date('Y') }} POS System | Powered by 
-        <a href="https://codecousins.com/" target="_blank" class="text-decoration-none">
-            CodeCousins
-        </a>
-    </footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <!-- Bootstrap Bundle JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    const SIDEBAR_KEY = 'sb_collapsed';
 
-    @stack('scripts')
+    function toggleSidebar() {
+        const sb = document.getElementById('sidebar');
+        sb.classList.toggle('collapsed');
+        localStorage.setItem(SIDEBAR_KEY, sb.classList.contains('collapsed') ? '1' : '0');
+    }
+
+    function openMobileSidebar() {
+        document.getElementById('sidebar').classList.add('mobile-open');
+        document.getElementById('sb-overlay').classList.add('active');
+    }
+
+    function closeMobileSidebar() {
+        document.getElementById('sidebar').classList.remove('mobile-open');
+        document.getElementById('sb-overlay').classList.remove('active');
+    }
+
+    // Position user dropdown dynamically so it never gets clipped
+    document.addEventListener('DOMContentLoaded', function () {
+        const sbFooter = document.querySelector('.sb-footer');
+        if (!sbFooter) return;
+
+        sbFooter.addEventListener('show.bs.dropdown', function () {
+            const sb = document.getElementById('sidebar');
+            const menu = sbFooter.querySelector('.dropdown-menu');
+            const sbWidth = sb ? sb.offsetWidth : 240;
+            menu.style.left = (sbWidth + 4) + 'px';
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        if (localStorage.getItem(SIDEBAR_KEY) === '1') {
+            document.getElementById('sidebar')?.classList.add('collapsed');
+        }
+    });
+</script>
+
+@stack('scripts')
 </body>
-
 </html>

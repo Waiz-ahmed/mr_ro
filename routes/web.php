@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DailySaleController;
 use App\Http\Controllers\CreditCustomerController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ExpenseController;
@@ -15,8 +16,9 @@ use App\Http\Controllers\ShopController;
 Route::get('/', fn() => redirect('/dashboard'));
 
 // Dashboard page (POS layout) - accessible to all authenticated users
-Route::get('/dashboard', fn() => view('home'))->middleware(['auth'])->name('dashboard');
-
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('dashboard');
 // Authenticated routes
 Route::middleware('auth')->group(function () {
 
@@ -206,7 +208,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/shops/{shop}/fbr', [\App\Http\Controllers\FbrSettingController::class, 'storeOrUpdate'])
             ->name('shops.fbr.update');
     });
-
+    // Route::view('/', 'home');
 });
 
 // Include Breeze default auth routes (login, register, etc.)
