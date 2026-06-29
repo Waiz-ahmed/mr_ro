@@ -57,45 +57,40 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'role_user');
     }
 
-    public function hasRole($roleSlug)
+    // Fix: use 'name' not 'slug' (roles table has no slug column)
+    public function hasRole($roleName)
     {
-        return $this->roles()->where('name', $roleSlug)->exists();
+        return $this->roles()->where('name', $roleName)->exists();
     }
 
     public function hasPermission($permissionSlug)
     {
-        // Super admin has all permissions
         if ($this->hasRole('super-admin')) {
             return true;
         }
-        
-        foreach ($this->roles as $role) {
-            if ($role->hasPermission($permissionSlug)) {
-                return true;
-            }
-        }
-        
-        return false;
+
+        return $this->roles()
+            ->whereHas('permissions', function ($query) use ($permissionSlug) {
+                $query->where('slug', $permissionSlug);
+            })->exists();
     }
 
     public function canAccessMenu($menuRoute)
     {
-        // Super admin has access to all menus
         if ($this->hasRole('super-admin')) {
             return true;
         }
-        
-        // Check if user has any permission that grants access to this menu
-        $permissions = Permission::whereHas('menu', function($query) use ($menuRoute) {
+
+        $permissions = \App\Models\Permission::whereHas('menu', function ($query) use ($menuRoute) {
             $query->where('route', $menuRoute);
         })->where('type', 'menu')->get();
-        
+
         foreach ($permissions as $permission) {
             if ($this->hasPermission($permission->slug)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 }

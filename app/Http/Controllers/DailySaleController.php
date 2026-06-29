@@ -246,6 +246,12 @@ class DailySaleController extends Controller
 
     public function shopPosPage($shopId)
     {
+
+        if (session('pos_verified_shop') != $shopId) {
+            return redirect()->route('shops.cards')
+                ->with('pos_require_auth', $shopId);
+        }
+        
         $shop = \App\Models\Shop::findOrFail($shopId);
         $customers = \App\Models\Customer::all();
 

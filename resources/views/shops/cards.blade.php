@@ -40,12 +40,11 @@
                                     <i class="bi bi-clock me-1"></i>
                                     {{ $shop->created_at->diffForHumans() }}
                                 </p>
-                                <a href="{{ route('shops.pos', $shop->id) }}" style="text-decoration: none;">
-                                    <button class="btn btn-sm"
-                                        style="background-color: #0d6efd; color: white; border: none; border-radius: 8px; padding: 0.5rem 1.2rem; font-weight: 500; transition: background-color 0.2s;">
-                                        <i class="bi bi-cart me-1"></i>Go to POS
-                                    </button>
-                                </a>
+                                <button class="btn btn-sm go-to-pos"
+                                    data-shop-id="{{ $shop->id }}"
+                                    style="background-color: #0d6efd; color: white; border: none; border-radius: 8px; padding: 0.5rem 1.2rem; font-weight: 500;">
+                                    <i class="bi bi-cart me-1"></i>Go to POS
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -130,5 +129,83 @@
     <!-- Add Bootstrap Icons if not already included in master layout -->
     @push('styles')
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    @endpush
+
+    {{-- POS Enter Password Modal --}}
+    <div class="modal fade" id="posEnterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-content border-0" style="border-radius: 16px;">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Enter POS Session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small mb-3">Enter your password to start a POS session.</p>
+                    <div id="posEnterError" class="alert alert-danger d-none"></div>
+                    <input type="hidden" id="posEnterShopId">
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Password</label>
+                        <input type="password" id="posEnterPassword" class="form-control" placeholder="Enter your password">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="posEnterConfirm">
+                        <span id="posEnterSpinner" class="spinner-border spinner-border-sm d-none me-1"></span>
+                        Enter POS
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+    // Open modal when Go to POS clicked
+    document.querySelectorAll('.go-to-pos').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.getElementById('posEnterShopId').value = this.dataset.shopId;
+            document.getElementById('posEnterPassword').value = '';
+            document.getElementById('posEnterError').classList.add('d-none');
+            new bootstrap.Modal(document.getElementById('posEnterModal')).show();
+        });
+    });
+
+    // Confirm entry
+    document.getElementById('posEnterConfirm').addEventListener('click', function () {
+        const password = document.getElementById('posEnterPassword').value;
+        const shopId = document.getElementById('posEnterShopId').value;
+        const spinner = document.getElementById('posEnterSpinner');
+        const errorDiv = document.getElementById('posEnterError');
+
+        if (!password) { errorDiv.textContent = 'Please enter your password.'; errorDiv.classList.remove('d-none'); return; }
+
+        spinner.classList.remove('d-none');
+        this.disabled = true;
+
+        fetch('{{ route("pos.verify") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: JSON.stringify({ password, shop_id: shopId })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = data.redirect;
+            } else {
+                errorDiv.textContent = data.message;
+                errorDiv.classList.remove('d-none');
+                spinner.classList.add('d-none');
+                this.disabled = false;
+            }
+        });
+    });
+
+    // Auto-trigger if redirected back requiring auth
+    @if(session('pos_require_auth'))
+        document.getElementById('posEnterShopId').value = '{{ session("pos_require_auth") }}';
+        new bootstrap.Modal(document.getElementById('posEnterModal')).show();
+    @endif
+    </script>
     @endpush
 @endsection

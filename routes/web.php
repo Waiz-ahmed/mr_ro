@@ -22,6 +22,9 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 // Authenticated routes
 Route::middleware('auth')->group(function () {
 
+    Route::post('/pos/verify-password', [App\Http\Controllers\PosSessionController::class, 'verify'])->name('pos.verify');
+    Route::post('/pos/exit', [App\Http\Controllers\PosSessionController::class, 'exit'])->name('pos.exit');
+
     Route::middleware(['permission:manage-permissions'])->prefix('admin')->name('admin.')->group(function () {
         // Permission dashboard
         Route::get('/permissions', [App\Http\Controllers\Admin\PermissionController::class, 'index'])->name('permissions.index');

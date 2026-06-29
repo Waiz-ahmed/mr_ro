@@ -555,13 +555,13 @@
 
             @endanypermission
 
-            {{-- Legacy fallback --}}
+            {{-- Legacy fallback
             @if(in_array(Auth::user()->role, ['admin','staff']) && !auth()->user()->hasPermission('view-customers'))
             <a class="sb-item" href="{{ route('customers.index') }}" data-label="Customers">
                 <i class="fa fa-users"></i>
                 <span class="sb-label">Customers (Legacy)</span>
             </a>
-            @endif
+            @endif --}}
 
         </div>
 
@@ -575,11 +575,13 @@
                     <div class="sb-user-info">
                         <div class="sb-user-name">{{ Auth::user()->name }}</div>
                         <div class="sb-user-role">
-                            @role('admin')
-                                Admin
+                           @if(auth()->user()->hasRole('super-admin'))
+                                Super Admin
+                            @elseif(auth()->user()->roles->isNotEmpty())
+                                {{ ucfirst(auth()->user()->roles->first()->name) }}
                             @else
-                                {{ ucfirst(Auth::user()->role) }}
-                            @endrole
+                                {{ ucfirst(Auth::user()->role ?? 'User') }}
+                            @endif
                         </div>
                     </div>
                 </a>
@@ -705,6 +707,103 @@
         }
     });
 </script>
+
+{{-- POS Exit Password Modal --}}
+@auth
+@if(session('pos_verified_shop'))
+<div class="modal fade" id="posExitModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+        <div class="modal-content border-0" style="border-radius: 16px;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold"><i class="fa fa-lock me-2"></i>Exit POS Session</h5>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small mb-3">Enter your password to exit the POS session.</p>
+                <div id="posExitError" class="alert alert-danger d-none"></div>
+                <input type="hidden" id="posExitRedirect">
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Password</label>
+                    <input type="password" id="posExitPassword" class="form-control" placeholder="Enter your password">
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Stay in POS</button>
+                <button type="button" class="btn btn-danger" id="posExitConfirm">
+                    <span id="posExitSpinner" class="spinner-border spinner-border-sm d-none me-1"></span>
+                    Exit POS
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const posExitModal = new bootstrap.Modal(document.getElementById('posExitModal'), { backdrop: 'static', keyboard: false });
+
+    // Intercept ALL sidebar nav links
+    document.querySelectorAll('.sb-nav .sb-item, .sb-footer .dropdown-item').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            // Allow logout form to submit normally
+            if (this.closest('form')) return;
+            e.preventDefault();
+            document.getElementById('posExitRedirect').value = this.href || '/dashboard';
+            document.getElementById('posExitPassword').value = '';
+            document.getElementById('posExitError').classList.add('d-none');
+            posExitModal.show();
+        });
+    });
+
+    // Intercept browser back button
+    history.pushState(null, null, location.href);
+    window.addEventListener('popstate', function() {
+        history.pushState(null, null, location.href);
+        document.getElementById('posExitRedirect').value = document.referrer || '/dashboard';
+        document.getElementById('posExitPassword').value = '';
+        document.getElementById('posExitError').classList.add('d-none');
+        posExitModal.show();
+    });
+
+    // Confirm exit
+    document.getElementById('posExitConfirm').addEventListener('click', function() {
+        const password = document.getElementById('posExitPassword').value;
+        const redirectTo = document.getElementById('posExitRedirect').value;
+        const spinner = document.getElementById('posExitSpinner');
+        const errorDiv = document.getElementById('posExitError');
+
+        if (!password) {
+            errorDiv.textContent = 'Please enter your password.';
+            errorDiv.classList.remove('d-none');
+            return;
+        }
+
+        spinner.classList.remove('d-none');
+        this.disabled = true;
+
+        fetch('{{ route("pos.exit") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ password: password, redirect_to: redirectTo })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = data.redirect;
+            } else {
+                errorDiv.textContent = data.message;
+                errorDiv.classList.remove('d-none');
+                spinner.classList.add('d-none');
+                document.getElementById('posExitConfirm').disabled = false;
+            }
+        });
+    });
+});
+</script>
+@endif
+@endauth
 
 @stack('scripts')
 </body>

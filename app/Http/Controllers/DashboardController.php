@@ -21,7 +21,7 @@ class DashboardController extends Controller
         $shopIds = $user->shops()->pluck('id'); // shops owned by this user
 
         if ($shopIds->isEmpty()) {
-            return view('dashboard', $this->emptyDashboardData());
+            return view('home', $this->emptyDashboardData());
         }
 
         $today = Carbon::today();
