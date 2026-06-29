@@ -10,7 +10,7 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
 
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     </head>
     <body class="font-sans antialiased h-full text-slate-900">
         
@@ -19,7 +19,7 @@
             <div class="hidden lg:block relative bg-slate-900">
                 <img 
                     src="{{ asset('images/pos-hardware.png') }}" 
-                    alt="MR RO POS Hardware Ecosystem" 
+                    alt="POS Hardware Ecosystem" 
                     class="absolute inset-0 h-full w-full object-cover opacity-85"
                 >
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent flex flex-col justify-end p-12">
@@ -35,14 +35,14 @@
             <div class="flex flex-col justify-center px-6 py-12 sm:px-16 lg:px-20 bg-slate-50/50 backdrop-blur-sm">
                 
                 <div class="mx-auto w-full max-w-md">
-                    <div class="text-center lg:text-center mb-10">
+                    <div class="text-center lg:text-left mb-10">
                         <a href="/" class="inline-flex items-center gap-2 group focus:outline-none">
                             <span class="text-4xl font-black tracking-wider text-slate-800 group-hover:text-indigo-600 transition-colors duration-200">
                                 MR <span class="text-indigo-600">RO</span>
                             </span>
                         </a>
                         <p class="mt-3 text-sm text-slate-500 font-medium">
-                            Point of Sale
+                            Point of Sale Dashboard Login
                         </p>
                     </div>
 
