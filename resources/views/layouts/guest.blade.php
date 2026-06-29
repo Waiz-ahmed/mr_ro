@@ -35,7 +35,7 @@
             <div class="flex flex-col justify-center px-6 py-12 sm:px-16 lg:px-20 bg-slate-50/50 backdrop-blur-sm">
                 
                 <div class="mx-auto w-full max-w-md">
-                    <div class="text-center lg:text-left mb-10">
+                    <div class="text-center lg:text-center mb-10">
                         <a href="/" class="inline-flex items-center gap-2 group focus:outline-none">
                             <span class="text-4xl font-black tracking-wider text-slate-800 group-hover:text-indigo-600 transition-colors duration-200">
                                 MR <span class="text-indigo-600">RO</span>
