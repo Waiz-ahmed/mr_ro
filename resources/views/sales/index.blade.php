@@ -481,7 +481,8 @@
         fetch(form.action, {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    'X-Requested-With': 'XMLHttpRequest'  // ← add this line
                 },
                 body: formData
             })
