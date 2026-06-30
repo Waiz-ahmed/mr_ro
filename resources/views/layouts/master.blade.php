@@ -409,12 +409,19 @@
             {{-- Main --}}
             <div class="sb-section">Main</div>
 
+            @if(auth()->user()->hasRole('super-admin'))
             <a class="sb-item {{ request()->is('dashboard') ? 'active' : '' }}"
-               href="/dashboard"
-               data-label="Dashboard">
+            href="{{ route('dashboard') }}" data-label="Dashboard">
                 <i class="fa fa-th-large"></i>
                 <span class="sb-label">Dashboard</span>
             </a>
+            @else
+            <a class="sb-item {{ request()->is('my-dashboard') ? 'active' : '' }}"
+            href="{{ route('user.dashboard') }}" data-label="Dashboard">
+                <i class="fa fa-th-large"></i>
+                <span class="sb-label">Dashboard</span>
+            </a>
+            @endif
 
             @permission('view-customers')
             <a class="sb-item {{ request()->routeIs('customers.*') ? 'active' : '' }}"

@@ -93,4 +93,13 @@ class User extends Authenticatable
 
         return false;
     }
+
+    public function getFirstAccessibleRoute()
+    {
+        if ($this->hasRole('super-admin')) {
+            return route('dashboard');
+        }
+
+        return route('user.dashboard');
+    }
 }

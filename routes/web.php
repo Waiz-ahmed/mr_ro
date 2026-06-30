@@ -13,12 +13,21 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ShopController;
 
 // Redirect root to dashboard
-Route::get('/', fn() => redirect('/dashboard'));
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect(auth()->user()->getFirstAccessibleRoute());
+    }
+
+    return redirect()->route('login');
+});
 
 // Dashboard page (POS layout) - accessible to all authenticated users
 Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth'])
+    ->middleware(['auth', 'permission:view-dashboard'])
     ->name('dashboard');
+Route::get('/my-dashboard', [DashboardController::class, 'userDashboard'])
+    ->middleware(['auth'])
+    ->name('user.dashboard');
 // Authenticated routes
 Route::middleware('auth')->group(function () {
 

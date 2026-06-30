@@ -24,6 +24,7 @@
                         <label for="module" class="form-label">Module *</label>
                         <select class="form-control" id="module" name="module" required>
                             <option value="">Select Module</option>
+                            <option value="dashboard">Dashboard</option>
                             <option value="customers">Customers</option>
                             <option value="orders">Orders</option>
                             <option value="credits">Credits</option>

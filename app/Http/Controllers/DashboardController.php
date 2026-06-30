@@ -114,4 +114,11 @@ class DashboardController extends Controller
             'labels' => [], 'salesData' => [], 'recentSales' => collect(),
         ];
     }
+
+    public function userDashboard()
+    {
+        $totalCustomers = \App\Models\Customer::count();
+
+        return view('dashboard.user', compact('totalCustomers'));
+    }
 }

@@ -109,7 +109,7 @@ class PermissionController extends Controller
             'module' => $request->module,
             'action' => $request->action ?? 'view',
             'type' => $request->type,
-            'menu_id' => $request->menu_id,
+            'menu_id' => $request->menu_id ?: null,
             'created_by' => auth()->id()
         ]);
 
