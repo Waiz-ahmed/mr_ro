@@ -41,12 +41,14 @@ class PaymentController extends Controller
             'customer_id'     => 'required|exists:customers,id',
             'amount_paid'     => 'required|numeric|min:1',
             'payment_method'  => 'required|string|max:50',
-            'note'            => 'nullable|string|max:255'
+            'note'            => 'nullable|string|max:255',
+            'shop_id'         => 'required|exists:shops,id'
         ]);
 
         // Create payment record
         $payment = Payment::create([
             'customer_id'    => $request->customer_id,
+            'shop_id'        => $request->shop_id,
             'amount_paid'    => $request->amount_paid,
             'payment_method' => $request->payment_method,
             'note'           => $request->note,

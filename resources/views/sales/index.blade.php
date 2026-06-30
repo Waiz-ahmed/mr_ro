@@ -344,7 +344,6 @@
 </div>
 
 <div class="modal fade" id="outstandingModal" tabindex="-1" aria-labelledby="outstandingModalLabel" aria-hidden="true">
-    <!-- Modal content unchanged -->
     <div class="modal-dialog">
         <form method="POST" action="{{ route('payments.store') }}">
             @csrf
@@ -354,6 +353,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Add hidden shop_id -->
+                    <input type="hidden" name="shop_id" value="{{ $shop->id ?? '' }}">
+                    
                     <div class="mb-3">
                         <label for="customerSelectOutstanding" class="form-label">Select Customer</label>
                         <select name="customer_id" id="customerSelectOutstanding" class="form-select" required>
