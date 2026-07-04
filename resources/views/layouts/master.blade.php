@@ -113,7 +113,7 @@
             gap: 10px;
             padding: 10px 14px;
             color: rgba(255, 255, 255, 0.85);
-            font-size: 13.5px;
+            font-size: 16px;
             text-decoration: none;
             white-space: nowrap;
             transition: background 0.15s, color 0.15s;
@@ -202,8 +202,8 @@
 
         .sb-user-info { opacity: 1; transition: opacity 0.2s; overflow: hidden; }
         #sidebar.collapsed .sb-user-info { opacity: 0; }
-        .sb-user-name { font-size: 13px; font-weight: 500; color: #fff; line-height: 1.2; }
-        .sb-user-role { font-size: 11px; color: rgba(255, 255, 255, 0.55); }
+        .sb-user-name { font-size: 16px; font-weight: 500; color: #fff; line-height: 1.2; }
+        .sb-user-role { font-size: 14px; color: rgba(255, 255, 255, 0.55); }
 
         /* ── Main area ── */
         .app-main {
@@ -637,7 +637,7 @@
             {{-- ─── End Shops Section Topbar ─── --}}
 
             <div class="ms-auto d-flex align-items-center gap-3">
-                <span class="text-muted" style="font-size:13px">{{ now()->format('d M Y') }}</span>
+                <span class="text-muted" style="font-size:16px">{{ now()->format('d M Y') }}</span>
             </div>
         </div>
         @endauth
