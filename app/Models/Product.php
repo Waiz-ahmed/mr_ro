@@ -2,25 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
     protected $table = 'products';
 
     protected $fillable = [
-        'template_id', 'sku', 'barcode', 'weight', 'volume', 'image',
-        'extra_price', 'status'
-    ];
-
-    protected $casts = [
-        'weight'      => 'decimal:4',
-        'volume'      => 'decimal:4',
-        'extra_price' => 'decimal:2',
+        'template_id', 'sku', 'barcode', 'weight', 'volume',
+        'image', 'extra_price', 'status'
     ];
 
     public function template()

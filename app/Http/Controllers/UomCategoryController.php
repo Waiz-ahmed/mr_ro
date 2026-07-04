@@ -3,67 +3,46 @@
 namespace App\Http\Controllers;
 
 use App\Models\UomCategory;
+use App\Models\Uom;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\UomCategoriesImport;
 
 class UomCategoryController extends Controller
 {
     public function index()
     {
-        $categories = UomCategory::latest()->paginate(20);
-        return view('foundation.uom_categories.index', compact('categories'));
-    }
-
-    public function create()
-    {
-        return view('foundation.uom_categories.create');
+        $categories = UomCategory::withCount('uoms')
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->paginate(20);
+        return view('uom_categories.index', compact('categories'));
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name'   => 'required|string|max:100|unique:uom_categories,name',
-            'status' => 'in:active,inactive',
+        $request->validate([
+            'name' => 'required|string|max:100|unique:uom_categories,name',
         ]);
 
-        UomCategory::create($validated);
-
-        return redirect()->route('uom_categories.index')->with('success', 'UOM Category created.');
-    }
-
-    public function show(UomCategory $uomCategory)
-    {
-        return view('foundation.uom_categories.show', compact('uomCategory'));
-    }
-
-    public function edit(UomCategory $uomCategory)
-    {
-        return view('foundation.uom_categories.edit', compact('uomCategory'));
+        UomCategory::create(['name' => $request->name, 'status' => 'active']);
+        return redirect()->back()->with('success', 'UOM Category created successfully!');
     }
 
     public function update(Request $request, UomCategory $uomCategory)
     {
-        $validated = $request->validate([
-            'name'   => 'required|string|max:100|unique:uom_categories,name,' . $uomCategory->id,
-            'status' => 'in:active,inactive',
+        $request->validate([
+            'name' => 'required|string|max:100|unique:uom_categories,name,' . $uomCategory->id,
         ]);
 
-        $uomCategory->update($validated);
-
-        return redirect()->route('uom_categories.index')->with('success', 'UOM Category updated.');
+        $uomCategory->update(['name' => $request->name]);
+        return redirect()->back()->with('success', 'UOM Category updated successfully!');
     }
 
     public function destroy(UomCategory $uomCategory)
     {
+        if ($uomCategory->uoms()->count() > 0) {
+            return redirect()->back()->with('error', 'Cannot delete a category that has UOMs assigned to it.');
+        }
         $uomCategory->delete();
-        return redirect()->route('uom_categories.index')->with('success', 'UOM Category deleted.');
-    }
-
-    public function import(Request $request)
-    {
-        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
-        Excel::import(new UomCategoriesImport, $request->file('file'));
-        return redirect()->back()->with('success', 'UOM Categories imported successfully!');
+        return redirect()->back()->with('success', 'UOM Category deleted successfully!');
     }
 }

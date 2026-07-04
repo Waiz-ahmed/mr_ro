@@ -4,69 +4,63 @@ namespace App\Http\Controllers;
 
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\ProductCategoriesImport;
 
 class ProductCategoryController extends Controller
 {
     public function index()
     {
-        $categories = ProductCategory::with('parent')->latest()->paginate(20);
-        return view('products.categories.index', compact('categories'));
-    }
+        $categories = ProductCategory::withCount('templates')
+            ->with('parent')
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->paginate(20);
 
-    public function create()
-    {
-        $categories = ProductCategory::where('status', 'active')->get();
-        return view('products.categories.create', compact('categories'));
+        return view('product_category.index', compact('categories'));
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
+            'name'      => 'required|string|max:191',
             'parent_id' => 'nullable|exists:product_categories,id',
-            'name'      => 'required|string|max:191|unique:product_categories,name',
-            'description'=> 'nullable|string',
-            'status'    => 'in:active,inactive',
+            'description' => 'nullable|string',
         ]);
-        ProductCategory::create($validated);
-        return redirect()->route('product_categories.index')->with('success', 'Category created.');
+
+        ProductCategory::create([
+            'name'        => $request->name,
+            'parent_id'   => $request->parent_id ?: null,
+            'description' => $request->description,
+            'status'      => 'active',
+        ]);
+
+        return redirect()->back()->with('success', 'Category created successfully!');
     }
 
-    public function show(ProductCategory $productCategory)
+    public function update(Request $request, ProductCategory $category)
     {
-        $productCategory->load('parent', 'children');
-        return view('products.categories.show', compact('productCategory'));
-    }
-
-    public function edit(ProductCategory $productCategory)
-    {
-        $categories = ProductCategory::where('status', 'active')->where('id', '!=', $productCategory->id)->get();
-        return view('products.categories.edit', compact('productCategory', 'categories'));
-    }
-
-    public function update(Request $request, ProductCategory $productCategory)
-    {
-        $validated = $request->validate([
+        $request->validate([
+            'name'      => 'required|string|max:191',
             'parent_id' => 'nullable|exists:product_categories,id',
-            'name'      => 'required|string|max:191|unique:product_categories,name,' . $productCategory->id,
-            'description'=> 'nullable|string',
-            'status'    => 'in:active,inactive',
+            'description' => 'nullable|string',
         ]);
-        $productCategory->update($validated);
-        return redirect()->route('product_categories.index')->with('success', 'Category updated.');
+
+        $category->update([
+            'name'        => $request->name,
+            'parent_id'   => $request->parent_id ?: null,
+            'description' => $request->description,
+        ]);
+
+        return redirect()->back()->with('success', 'Category updated successfully!');
     }
 
-    public function destroy(ProductCategory $productCategory)
+    public function destroy(ProductCategory $category)
     {
-        $productCategory->delete();
-        return redirect()->route('product_categories.index')->with('success', 'Category deleted.');
-    }
+        if ($category->templates()->count() > 0) {
+            return redirect()->back()->with('error', 'Cannot delete category with products assigned to it.');
+        }
 
-    public function import(Request $request)
-    {
-        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
-        Excel::import(new ProductCategoriesImport, $request->file('file'));
-        return redirect()->back()->with('success', 'Categories imported.');
+        $category->delete();
+
+        return redirect()->back()->with('success', 'Category deleted successfully!');
     }
 }

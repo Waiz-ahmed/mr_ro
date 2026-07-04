@@ -246,24 +246,46 @@ class DailySaleController extends Controller
 
     public function shopPosPage($shopId)
     {
-
         if (session('pos_verified_shop') != $shopId) {
             return redirect()->route('shops.cards')
                 ->with('pos_require_auth', $shopId);
         }
-        
-        $shop = \App\Models\Shop::findOrFail($shopId);
-        $customers = \App\Models\Customer::all();
 
-        return view('sales.index', compact('shop', 'customers'));
+        $shop       = \App\Models\Shop::findOrFail($shopId);
+        $customers  = \App\Models\Customer::all();
+        $categories = \App\Models\ProductCategory::with(['templates' => function ($q) {
+                            $q->where('status', 'active')->where('sale_ok', 1);
+                        }])
+                        ->where('status', 'active')
+                        ->orderBy('name')
+                        ->get();
+
+        // "All" pseudo-category carries every sellable product
+        $allProducts = \App\Models\ProductTemplate::where('status', 'active')
+                        ->where('sale_ok', 1)
+                        ->orderBy('name')
+                        ->get();
+
+        return view('sales.index', compact('shop', 'customers', 'categories', 'allProducts'));
     }
 
     public function pos($shopId)
     {
-        $customers = Customer::all();
-        $shop = \App\Models\Shop::findOrFail($shopId);
+        $shop       = \App\Models\Shop::findOrFail($shopId);
+        $customers  = \App\Models\Customer::all();
+        $categories = \App\Models\ProductCategory::with(['templates' => function ($q) {
+                            $q->where('status', 'active')->where('sale_ok', 1);
+                        }])
+                        ->where('status', 'active')
+                        ->orderBy('name')
+                        ->get();
 
-        return view('sales.index', compact('customers', 'shop'));
+        $allProducts = \App\Models\ProductTemplate::where('status', 'active')
+                        ->where('sale_ok', 1)
+                        ->orderBy('name')
+                        ->get();
+
+        return view('sales.index', compact('shop', 'customers', 'categories', 'allProducts'));
     }
 
 

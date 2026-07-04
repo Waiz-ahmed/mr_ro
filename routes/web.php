@@ -220,6 +220,78 @@ Route::middleware('auth')->group(function () {
         Route::post('/shops/{shop}/fbr', [\App\Http\Controllers\FbrSettingController::class, 'storeOrUpdate'])
             ->name('shops.fbr.update');
     });
+
+    Route::middleware(['permission:view-product-categories'])->group(function () {
+        Route::get('/product-categories', [App\Http\Controllers\ProductCategoryController::class, 'index'])
+            ->name('product-categories.index');
+    });
+    Route::middleware(['permission:create-product-category'])->group(function () {
+        Route::post('/product-categories', [App\Http\Controllers\ProductCategoryController::class, 'store'])
+            ->name('product-categories.store');
+    });
+    Route::middleware(['permission:edit-product-category'])->group(function () {
+        Route::put('/product-categories/{category}', [App\Http\Controllers\ProductCategoryController::class, 'update'])
+            ->name('product-categories.update');
+    });
+    Route::middleware(['permission:delete-product-category'])->group(function () {
+        Route::delete('/product-categories/{category}', [App\Http\Controllers\ProductCategoryController::class, 'destroy'])
+            ->name('product-categories.destroy');
+    });
+    
+    // Products
+    Route::middleware(['permission:view-products'])->group(function () {
+        Route::get('/products', [App\Http\Controllers\ProductController::class, 'index'])
+            ->name('products.index');
+    });
+    Route::middleware(['permission:create-product'])->group(function () {
+        Route::post('/products', [App\Http\Controllers\ProductController::class, 'store'])
+            ->name('products.store');
+    });
+    Route::middleware(['permission:edit-product'])->group(function () {
+        Route::put('/products/{product}', [App\Http\Controllers\ProductController::class, 'update'])
+            ->name('products.update');
+    });
+    Route::middleware(['permission:delete-product'])->group(function () {
+        Route::delete('/products/{product}', [App\Http\Controllers\ProductController::class, 'destroy'])
+            ->name('products.destroy');
+    });
+
+    // UOM Categories
+    Route::middleware(['permission:view-uom-categories'])->group(function () {
+        Route::get('/uom-categories', [App\Http\Controllers\UomCategoryController::class, 'index'])
+            ->name('uom-categories.index');
+    });
+    Route::middleware(['permission:create-uom-category'])->group(function () {
+        Route::post('/uom-categories', [App\Http\Controllers\UomCategoryController::class, 'store'])
+            ->name('uom-categories.store');
+    });
+    Route::middleware(['permission:edit-uom-category'])->group(function () {
+        Route::put('/uom-categories/{uomCategory}', [App\Http\Controllers\UomCategoryController::class, 'update'])
+            ->name('uom-categories.update');
+    });
+    Route::middleware(['permission:delete-uom-category'])->group(function () {
+        Route::delete('/uom-categories/{uomCategory}', [App\Http\Controllers\UomCategoryController::class, 'destroy'])
+            ->name('uom-categories.destroy');
+    });
+
+    // UOMs
+    Route::middleware(['permission:view-uoms'])->group(function () {
+        Route::get('/uoms', [App\Http\Controllers\UomController::class, 'index'])
+            ->name('uoms.index');
+    });
+    Route::middleware(['permission:create-uom'])->group(function () {
+        Route::post('/uoms', [App\Http\Controllers\UomController::class, 'store'])
+            ->name('uoms.store');
+    });
+    Route::middleware(['permission:edit-uom'])->group(function () {
+        Route::put('/uoms/{uom}', [App\Http\Controllers\UomController::class, 'update'])
+            ->name('uoms.update');
+    });
+    Route::middleware(['permission:delete-uom'])->group(function () {
+        Route::delete('/uoms/{uom}', [App\Http\Controllers\UomController::class, 'destroy'])
+            ->name('uoms.destroy');
+    });
+
     // Route::view('/', 'home');
 });
 
